@@ -1,0 +1,17 @@
+.article {
+	text-align: center;
+}
+.title {
+	font-size: 24px;
+}
+.subtitle {
+	font-size: 18px;
+}
+.btnSection {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	flex-direction: column;
+	gap: 1rem;
+}
