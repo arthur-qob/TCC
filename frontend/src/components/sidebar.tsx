@@ -9,8 +9,12 @@ import {
 	Menu,
 	X,
 	LogOut,
-	ChevronLeft
+	ChevronLeft,
+	Sun,
+	Moon,
+	Monitor
 } from 'lucide-react'
+import { useTheme } from '../context/theme'
 
 interface MenuItem {
 	icon: React.ComponentType<{ size?: number; className?: string }>
@@ -25,7 +29,8 @@ interface SidebarProps {
 
 const Sidebar = ({ className = '' }: SidebarProps) => {
 	const [isOpen, setIsOpen] = useState(false)
-	const [isCollapsed, setIsCollapsed] = useState(false)
+	const [isCollapsed, setIsCollapsed] = useState(true)
+	const { theme, toggleTheme, actualTheme } = useTheme()
 
 	const menuItems: MenuItem[] = [
 		{ icon: Home, label: 'Dashboard', href: '#' },
@@ -46,7 +51,10 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 		<>
 			{/* Mobile Toggle Button */}
 			<button
-				onClick={() => setIsOpen(!isOpen)}
+				onClick={() => {
+					setIsOpen(!isOpen)
+					setIsCollapsed(false)
+				}}
 				className='lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-lg'
 				aria-label={isOpen ? 'Fechar menu' : 'Abrir menu'}
 				aria-expanded={isOpen}>
@@ -65,19 +73,24 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 			{/* Sidebar */}
 			<aside
 				className={`
-					fixed top-0 left-0 h-screen bg-white text-gray-900 z-40
+					fixed top-0 left-0 h-screen z-40
 					transition-all duration-300 ease-in-out
 					${isCollapsed ? 'w-20' : 'w-64'}
 					${isOpen ? 'translate-x-0' : '-translate-x-full'}
 					lg:translate-x-0 flex flex-col shadow-2xl
+					${actualTheme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}
 					${className}
 				`}
 				role='navigation'
 				aria-label='Menu principal'>
 				{/* Header */}
 				<div
-					className={`p-6 border-b border-gray-300 flex items-center ${
+					className={`p-6 border-b flex items-center ${
 						isCollapsed ? 'justify-center' : 'justify-between'
+					} ${
+						actualTheme === 'dark'
+							? 'border-gray-700'
+							: 'border-gray-300'
 					}`}>
 					<div
 						className={`overflow-hidden transition-all ${
@@ -89,7 +102,12 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 							className='h-8 w-auto object-contain'
 						/>
 						<div className='flex items-center gap-2 mt-2'>
-							<span className='text-xs text-gray-500 whitespace-nowrap'>
+							<span
+								className={`text-xs whitespace-nowrap ${
+									actualTheme === 'dark'
+										? 'text-gray-400'
+										: 'text-gray-500'
+								}`}>
 								Powered by
 							</span>
 							<a
@@ -107,7 +125,11 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 					{/* Desktop Collapse Toggle */}
 					<button
 						onClick={() => setIsCollapsed(!isCollapsed)}
-						className='hidden lg:flex items-center justify-center w-8 h-8 rounded-lg text-gray-900 hover:bg-gray-800 hover:text-white transition-colors flex-shrink-0'
+						className={`hidden lg:flex items-center justify-center w-8 h-8 rounded-lg transition-colors flex-shrink-0 ${
+							actualTheme === 'dark'
+								? 'text-white hover:bg-gray-800'
+								: 'text-gray-900 hover:bg-gray-800 hover:text-white'
+						}`}
 						aria-label={
 							isCollapsed
 								? 'Expandir sidebar'
@@ -129,14 +151,19 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 							<li key={index}>
 								<a
 									href={item.href}
-									className='flex items-center gap-3 px-4 py-3 rounded-lg
-										hover:bg-gray-300 transition-all group relative
-										focus:outline-none focus:ring-2 focus:ring-red-500'
+									className={`flex items-center gap-3 px-4 py-3 rounded-lg
+										transition-all group relative
+										focus:outline-none focus:ring-2 focus:ring-red-500
+										${actualTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-300'}`}
 									onClick={handleNavigation}
 									title={isCollapsed ? item.label : ''}>
 									<item.icon
 										size={20}
-										className='w-[18px] text-gray-400 group-hover:text-red-400 transition-colors flex-shrink-0'
+										className={`w-[18px] transition-colors flex-shrink-0 ${
+											actualTheme === 'dark'
+												? 'text-gray-400 group-hover:text-red-400'
+												: 'text-gray-400 group-hover:text-red-400'
+										}`}
 									/>
 									<span
 										className={`font-medium transition-all ${
@@ -161,12 +188,21 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 				</nav>
 
 				{/* User Info Footer */}
-				<div className='p-4 border-t border-gray-300'>
+				<div
+					className={`p-4 border-t ${
+						actualTheme === 'dark'
+							? 'border-gray-700'
+							: 'border-gray-300'
+					}`}>
 					<div
 						className={`flex items-center ${
 							isCollapsed ? '' : 'gap-3'
-						} px-4 py-3 rounded-lg hover:bg-gray-300 transition-colors cursor-pointer ${
+						} px-4 py-3 rounded-lg transition-colors cursor-pointer ${
 							isCollapsed ? 'justify-center' : ''
+						} ${
+							actualTheme === 'dark'
+								? 'hover:bg-gray-700'
+								: 'hover:bg-gray-300'
 						}`}>
 						<div
 							className='w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center flex-shrink-0'
@@ -182,18 +218,76 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 							<p className='text-sm font-medium whitespace-nowrap'>
 								Fábio Ramos
 							</p>
-							<p className='text-xs text-gray-500 whitespace-nowrap'>
+							<p
+								className={`text-xs whitespace-nowrap ${
+									actualTheme === 'dark'
+										? 'text-gray-400'
+										: 'text-gray-500'
+								}`}>
 								fabioramos@ziranlog.com.br
 							</p>
 						</div>
 					</div>
+
+					{/* Theme Toggle */}
+					<button
+						onClick={toggleTheme}
+						className={`mt-2 w-full flex items-center ${
+							isCollapsed ? '' : 'gap-3'
+						} px-4 py-3 rounded-lg transition-colors
+							focus:outline-none focus:ring-2 focus:ring-red-500
+							${isCollapsed ? 'justify-center' : ''}
+							${actualTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-300'}`}
+						title={
+							isCollapsed
+								? theme === 'light'
+									? 'Tema claro'
+									: theme === 'dark'
+									? 'Tema escuro'
+									: 'Tema do sistema'
+								: ''
+						}
+						aria-label='Alternar tema'>
+						{theme === 'light' ? (
+							<Sun
+								size={20}
+								className='flex-shrink-0'
+							/>
+						) : theme === 'dark' ? (
+							<Moon
+								size={20}
+								className='flex-shrink-0'
+							/>
+						) : (
+							<Monitor
+								size={20}
+								className='flex-shrink-0'
+							/>
+						)}
+						<span
+							className={`font-medium transition-all ${
+								isCollapsed
+									? 'w-0 opacity-0'
+									: 'w-auto opacity-100'
+							} whitespace-nowrap overflow-hidden`}>
+							{theme === 'light'
+								? 'Tema claro'
+								: theme === 'dark'
+								? 'Tema escuro'
+								: 'Tema do sistema'}
+						</span>
+					</button>
 
 					{/* Logout Button */}
 					<button
 						className={`mt-2 w-full flex items-center ${
 							isCollapsed ? '' : 'gap-3'
 						} px-4 py-3 rounded-lg
-							hover:bg-red-900/20 text-red-400 transition-colors
+							${
+								actualTheme === 'dark'
+									? 'hover:bg-red-800/30'
+									: 'hover:bg-red-800/10'
+							} text-red-400 transition-colors
 							focus:outline-none focus:ring-2 focus:ring-red-500
 							${isCollapsed ? 'justify-center' : ''}`}
 						title={isCollapsed ? 'Sair' : ''}

@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom'
+import { Route, Routes, Navigate } from 'react-router-dom'
 import Login from './pages/login'
 import HomePage from './pages'
 
@@ -7,11 +7,15 @@ const AppRoutes = () => {
 		<Routes>
 			<Route
 				path='/'
-				element={<HomePage />}
+				element={<Navigate to='/login' replace />}
 			/>
 			<Route
 				path='/login'
 				element={<Login />}
+			/>
+			<Route
+				path='/dashboard'
+				element={<HomePage />}
 			/>
 		</Routes>
 	)

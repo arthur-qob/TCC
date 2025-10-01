@@ -31,17 +31,20 @@ const HomePage = () => {
 								</div>
 							))}
 						</div>
+
+						<div className='flex justify-center mt-6'>
+							<button
+								className='border border-[rgb(10,132,255)] bg-[rgb(10,132,255)] text-white px-4 py-2 rounded-lg hover:bg-[rgb(0,112,235)] transition-colors duration-300'
+								type='button'
+								onClick={() => {
+									navigate('/login')
+								}}>
+								Login page
+							</button>
+						</div>
 					</div>
 				</div>
 			</div>
-			<button
-				className='border border-[rgb(10,132,255)] bg-[rgb(10,132,255)] text-white px-4 py-2 rounded-lg hover:bg-[rgb(0,112,235)] my-auto'
-				type='button'
-				onClick={() => {
-					navigate('/login')
-				}}>
-				Login page
-			</button>
 		</div>
 	)
 }

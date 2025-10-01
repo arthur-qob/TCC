@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ClipLoader } from 'react-spinners'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
+import { useNavigate } from 'react-router-dom'
 
 const Login = () => {
 	const [email, setEmail] = useState('')
@@ -16,6 +17,8 @@ const Login = () => {
 	const togglePasswordVisibility = () => {
 		setShowPassword((prev) => !prev)
 	}
+
+	const navigate = useNavigate()
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
@@ -47,6 +50,7 @@ const Login = () => {
 		setTimeout(() => {
 			setLoading(false)
 			console.log('✅ Login successful with', { email, password })
+			navigate('/dashboard')
 		}, 2500)
 	}
 
@@ -61,7 +65,9 @@ const Login = () => {
 						Login
 					</h1>
 					<div className='flex flex-col gap-2'>
-						<label htmlFor='email' className='text-sm sm:text-base'>
+						<label
+							htmlFor='email'
+							className='text-sm sm:text-base'>
 							Email do usuário:
 						</label>
 						<input
@@ -84,7 +90,9 @@ const Login = () => {
 						{errors.email ? errors.email : 'No errors'}
 					</p>
 					<div className='flex flex-col gap-2'>
-						<label htmlFor='password' className='text-sm sm:text-base'>
+						<label
+							htmlFor='password'
+							className='text-sm sm:text-base'>
 							Senha:
 						</label>
 						<div
@@ -120,12 +128,12 @@ const Login = () => {
 						} text-sm mb-2`}>
 						{errors.password ? errors.password : 'No errors'}
 					</p>
-					<p className='text-blue-300 text-sm cursor-pointer hover:underline select-none'>
+					<p className='text-blue-300 text-sm cursor-pointer hover:underline select-none w-fit'>
 						Esqueceu a senha?
 					</p>
 					<button
 						type='button'
-						className='w-full border border-[rgb(213,16,31)] bg-[rgb(213,16,31)] text-white px-4 py-2 rounded-lg hover:bg-[hsl(355,86%,35%)] transition-colors my-4'
+						className='w-full border border-[rgb(213,16,31)] bg-[rgb(213,16,31)] text-white px-4 py-2 rounded-lg hover:bg-[hsl(355,86%,35%)] hover:border-[hsl(355,86%,35%)] transition-colors my-4'
 						onClick={handleSubmit}>
 						{loading ? (
 							<ClipLoader
