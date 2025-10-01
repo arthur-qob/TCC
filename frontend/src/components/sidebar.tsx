@@ -52,20 +52,28 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 			{/* Mobile Toggle Button */}
 			<button
 				onClick={() => {
-					setIsOpen(!isOpen)
-					setIsCollapsed(false)
+					const newIsOpen = !isOpen
+					setIsOpen(newIsOpen)
+					if (newIsOpen) {
+						setIsCollapsed(false)
+					} else {
+						setIsCollapsed(true)
+					}
 				}}
-				className='lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-lg'
+				className='lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors shadow-lg'
 				aria-label={isOpen ? 'Fechar menu' : 'Abrir menu'}
 				aria-expanded={isOpen}>
 				{isOpen ? <X size={24} /> : <Menu size={24} />}
 			</button>
 
-			{/* Mobile Overlay */}
-			{isOpen && (
+			{/* Sidebar Overlay */}
+			{(isOpen || !isCollapsed) && (
 				<div
-					className='lg:hidden fixed inset-0 bg-black/50 z-30 backdrop-blur-sm'
-					onClick={() => setIsOpen(false)}
+					className='fixed inset-0 bg-black/50 z-30 backdrop-blur-sm'
+					onClick={() => {
+						setIsOpen(false)
+						setIsCollapsed(true)
+					}}
 					aria-hidden='true'
 				/>
 			)}
@@ -75,9 +83,9 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 				className={`
 					fixed top-0 left-0 h-screen z-40
 					transition-all duration-300 ease-in-out
-					${isCollapsed ? 'w-20' : 'w-64'}
+					${isCollapsed && !isOpen ? 'w-20' : 'w-64'}
 					${isOpen ? 'translate-x-0' : '-translate-x-full'}
-					lg:translate-x-0 flex flex-col shadow-2xl
+					lg:translate-x-0 lg:${isCollapsed ? 'w-20' : 'w-64'} flex flex-col shadow-2xl
 					${actualTheme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}
 					${className}
 				`}

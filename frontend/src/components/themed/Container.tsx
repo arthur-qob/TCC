@@ -12,8 +12,8 @@ const Container = ({ children, className = '' }: ContainerProps) => {
 	const baseStyles = 'transition-colors duration-200'
 	const themeStyles =
 		actualTheme === 'dark'
-			? 'bg-gray-900 text-white'
-			: 'bg-white text-gray-900'
+			? 'bg-black text-white'
+			: 'bg-gray-100 text-gray-900'
 
 	return (
 		<div className={`${baseStyles} ${themeStyles} ${className}`}>

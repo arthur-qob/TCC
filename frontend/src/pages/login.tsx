@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { ClipLoader } from 'react-spinners'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 import { useNavigate } from 'react-router-dom'
+import { Eye, EyeOff } from 'lucide-react'
 
 const Login = () => {
 	const [email, setEmail] = useState('')
@@ -42,10 +41,6 @@ const Login = () => {
 		}
 
 		setErrors(newErrors)
-
-		if (newErrors.email || newErrors.password) {
-			setLoading(false)
-		}
 
 		setTimeout(() => {
 			setLoading(false)
@@ -113,9 +108,7 @@ const Login = () => {
 								type='button'
 								onClick={togglePasswordVisibility}>
 								<span className='text-gray-300 text-sm cursor-pointer select-none'>
-									<FontAwesomeIcon
-										icon={showPassword ? faEyeSlash : faEye}
-									/>
+									{showPassword ? <Eye /> : <EyeOff />}
 								</span>
 							</button>
 						</div>
@@ -133,13 +126,13 @@ const Login = () => {
 					</p>
 					<button
 						type='button'
-						className='w-full border border-[rgb(213,16,31)] bg-[rgb(213,16,31)] text-white px-4 py-2 rounded-lg hover:bg-[hsl(355,86%,35%)] hover:border-[hsl(355,86%,35%)] transition-colors my-4'
+						className='w-full flex items-center justify-center border border-[rgb(213,16,31)] bg-[rgb(213,16,31)] text-white px-4 py-2 rounded-lg hover:bg-[hsl(355,86%,35%)] hover:border-[hsl(355,86%,35%)] transition-colors my-4'
 						onClick={handleSubmit}>
 						{loading ? (
 							<ClipLoader
 								color='#fff'
 								loading={loading}
-								size={18}
+								size={20}
 								aria-label='Loading spinner'
 							/>
 						) : (
