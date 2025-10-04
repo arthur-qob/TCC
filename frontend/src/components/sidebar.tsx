@@ -15,6 +15,7 @@ import {
 	Monitor
 } from 'lucide-react'
 import { useTheme } from '../context/theme'
+import { useNavigate } from 'react-router-dom'
 
 interface MenuItem {
 	icon: React.ComponentType<{ size?: number; className?: string }>
@@ -31,9 +32,10 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 	const [isOpen, setIsOpen] = useState(false)
 	const [isCollapsed, setIsCollapsed] = useState(true)
 	const { theme, toggleTheme, actualTheme } = useTheme()
+	const navigate = useNavigate()
 
 	const menuItems: MenuItem[] = [
-		{ icon: Home, label: 'Dashboard', href: '#' },
+		{ icon: Home, label: 'Dashboard', href: '/dashboard' },
 		{ icon: Users, label: 'Usuários', href: '#' },
 		{ icon: BarChart2, label: 'Relatórios', href: '#' },
 		{ icon: FileText, label: 'Documentos', href: '#' },
@@ -157,13 +159,15 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 					<ul className='space-y-2'>
 						{menuItems.map((item, index) => (
 							<li key={index}>
-								<a
-									href={item.href}
+								<span
+									onClick={() => {
+										navigate(item.href)
+										handleNavigation
+									}}
 									className={`flex items-center gap-3 px-4 py-3 rounded-lg
 										transition-all group relative
 										focus:outline-none focus:ring-2 focus:ring-red-500
 										${actualTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-300'}`}
-									onClick={handleNavigation}
 									title={isCollapsed ? item.label : ''}>
 									<item.icon
 										size={20}
@@ -189,7 +193,7 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 									{item.badge && isCollapsed && (
 										<span className='absolute -top-1 -right-1 w-3 h-3 bg-red-600 text-white rounded-full' />
 									)}
-								</a>
+								</span>
 							</li>
 						))}
 					</ul>

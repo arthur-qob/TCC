@@ -9,7 +9,7 @@ interface ContainerProps {
 const Container = ({ children, className = '' }: ContainerProps) => {
 	const { actualTheme } = useTheme()
 
-	const baseStyles = 'transition-colors duration-200'
+	const baseStyles = 'p-4 transition-colors duration-200'
 	const themeStyles =
 		actualTheme === 'dark'
 			? 'bg-black text-white'

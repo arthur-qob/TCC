@@ -1,13 +1,4 @@
 import {
-	Eye,
-	ChevronsUpDown,
-	ChevronUp,
-	ChevronDown,
-	SquarePen,
-	UserPlus
-} from 'lucide-react'
-import { Container, Text } from '../components/themed'
-import {
 	TableContainer,
 	Table,
 	TableHead,
@@ -16,7 +7,14 @@ import {
 	TableCell,
 	Paper
 } from '@mui/material'
-import { useTheme } from '../context/theme'
+import {
+	Eye,
+	ChevronsUpDown,
+	ChevronUp,
+	ChevronDown,
+	SquarePen,
+	UserPlus
+} from 'lucide-react'
 import { useState } from 'react'
 
 type SortField =
@@ -27,26 +25,16 @@ type SortField =
 	| 'cargoType'
 	| 'client'
 type SortDirection = 'asc' | 'desc' | null
+import { Container, Text } from '../components/themed'
+import { useTheme } from '../context/theme'
+import { useNavigate } from 'react-router-dom'
 
 const HomePage = () => {
-	const role: string = 'programador'
-	const { actualTheme } = useTheme()
-	const [sortField, setSortField] = useState<SortField | null>(null)
-	const [sortDirection, setSortDirection] = useState<SortDirection>(null)
-
-	const statusColors: Record<string, { bg: string; text: string }> = {
-		Programando: { bg: 'bg-yellow-300', text: 'text-yellow-700' },
-		Transporte: { bg: 'bg-blue-300', text: 'text-blue-700' },
-		Concluído: { bg: 'bg-green-300', text: 'text-green-700' },
-		Cancelado: { bg: 'bg-red-300', text: 'text-red-700' },
-		'Em Análise': { bg: 'bg-purple-300', text: 'text-purple-700' },
-		Pendente: { bg: 'bg-orange-300', text: 'text-orange-700' }
-	}
-
+	const role: string = 'focal'
 	const ordersData = [
 		{
 			id: 1,
-			driver: 'Fulano',
+			driver: null,
 			status: 'Transporte',
 			createdAt: '29/08/2025',
 			operation: 'REDEX',
@@ -64,7 +52,7 @@ const HomePage = () => {
 		},
 		{
 			id: 3,
-			driver: 'Maria Santos',
+			driver: null,
 			status: 'Concluído',
 			createdAt: '28/08/2025',
 			operation: 'RODOV',
@@ -91,7 +79,7 @@ const HomePage = () => {
 		},
 		{
 			id: 6,
-			driver: 'Roberto Lima',
+			driver: null,
 			status: 'Pendente',
 			createdAt: '01/09/2025',
 			operation: 'REDEX',
@@ -99,6 +87,19 @@ const HomePage = () => {
 			client: 'Coca-Cola'
 		}
 	]
+	const { actualTheme } = useTheme()
+	const [sortField, setSortField] = useState<SortField | null>(null)
+	const [sortDirection, setSortDirection] = useState<SortDirection>(null)
+	const navigate = useNavigate()
+
+	const statusColors: Record<string, { bg: string; text: string }> = {
+		Programando: { bg: 'bg-yellow-300', text: 'text-yellow-700' },
+		Transporte: { bg: 'bg-blue-300', text: 'text-blue-700' },
+		Concluído: { bg: 'bg-green-300', text: 'text-green-700' },
+		Cancelado: { bg: 'bg-red-300', text: 'text-red-700' },
+		'Em Análise': { bg: 'bg-purple-300', text: 'text-purple-700' },
+		Pendente: { bg: 'bg-orange-300', text: 'text-orange-700' }
+	}
 
 	const handleSort = (field: SortField) => {
 		if (sortField === field) {
@@ -142,8 +143,24 @@ const HomePage = () => {
 	const sortedOrders = [...ordersData].sort((a, b) => {
 		if (!sortField || !sortDirection) return 0
 
-		const aValue = a[sortField]
-		const bValue = b[sortField]
+		let aValue = a[sortField]
+		let bValue = b[sortField]
+
+		// Handle null values
+		if (aValue === null && bValue === null) return 0
+		if (aValue === null) return sortDirection === 'asc' ? 1 : -1
+		if (bValue === null) return sortDirection === 'asc' ? -1 : 1
+
+		// Special handling for date sorting (createdAt field)
+		if (sortField === 'createdAt') {
+			// Convert DD/MM/YYYY to Date object for proper comparison
+			const parseDate = (dateStr: string) => {
+				const [day, month, year] = dateStr.split('/')
+				return new Date(Number(year), Number(month) - 1, Number(day))
+			}
+			aValue = parseDate(aValue as string).getTime()
+			bValue = parseDate(bValue as string).getTime()
+		}
 
 		if (sortDirection === 'asc') {
 			return aValue > bValue ? 1 : -1
@@ -167,12 +184,16 @@ const HomePage = () => {
 
 	return (
 		<Container className='flex flex-col items-end min-h-screen gap-4'>
-			<div className='w-[95%] px-5 py-8 flex flex-col gap-10'>
+			<div
+				className='w-[95%] px-5 py-8 flex flex-col gap-10'
+				data-aos='fade-up'>
 				<Text className='w-fit capitalize text-2xl font-medium'>
 					{role}
 				</Text>
 				{(role === 'focal' || role === 'gerente') && (
-					<button className='w-fit bg-[rgb(15,219,110)] hover:bg-[hsla(149,87%,40%,1.00)] transition-colors duration-300 text-white px-2 py-3 rounded-xl shadow-lg'>
+					<button
+						className='w-fit bg-[rgb(15,219,110)] hover:bg-[hsla(149,87%,40%,1.00)] transition-colors duration-300 text-white px-2 py-3 rounded-xl shadow-lg'
+						onClick={() => navigate('/cadastrarPedido')}>
 						Criar novo pedido
 					</button>
 				)}
@@ -297,17 +318,17 @@ const HomePage = () => {
 										{getSortIcon('client')}
 									</div>
 								</TableCell>
-								<TableCell
-									align='center'
-									sx={{
-										fontWeight: 'bold',
-										color:
-											actualTheme === 'dark'
-												? '#ffffff'
-												: '#000000'
-									}}>
-									AÇÕES
-								</TableCell>
+								{role === 'gerente' && (
+									<TableCell
+										align='center'
+										sx={{
+											fontWeight: 'bold',
+											color:
+												actualTheme === 'dark'
+													? '#ffffff'
+													: '#000000'
+										}}></TableCell>
+								)}
 							</TableRow>
 						</TableHead>
 						<TableBody>
@@ -332,7 +353,13 @@ const HomePage = () => {
 													? '#ffffff'
 													: '#000000'
 										}}>
-										{order.driver}
+										{order.driver ? (
+											order.driver
+										) : role === 'focal' ? (
+											'Não definido'
+										) : (
+											<UserPlus className='mx-auto text-blue-500 hover:text-blue-600 transition-colors duration-300'></UserPlus>
+										)}
 									</TableCell>
 									<TableCell align='center'>
 										<p
@@ -386,16 +413,18 @@ const HomePage = () => {
 										}}>
 										{order.client}
 									</TableCell>
-									<TableCell
-										align='center'
-										sx={{
-											color:
-												actualTheme === 'dark'
-													? '#ffffff'
-													: '#000000'
-										}}>
-										{roleActions[role]}
-									</TableCell>
+									{role === 'gerente' && (
+										<TableCell
+											align='center'
+											sx={{
+												color:
+													actualTheme === 'dark'
+														? '#ffffff'
+														: '#000000'
+											}}>
+											{roleActions[role]}
+										</TableCell>
+									)}
 								</TableRow>
 							))}
 						</TableBody>
