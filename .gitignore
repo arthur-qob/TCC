@@ -1,5 +1,9 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+###############################################################################
+# Frontend (Node.js/React/Next.js)
+###############################################################################
+
 # dependencies
 node_modules
 /.pnp
@@ -15,10 +19,7 @@ node_modules
 
 # production
 /build
-
-# misc
-.DS_Store
-*.pem
+/dist
 
 # debug
 npm-debug.log*
@@ -26,12 +27,87 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
-
 # vercel
 .vercel
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+###############################################################################
+# Backend (Java/Spring Boot/Maven)
+###############################################################################
+
+# Maven
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+HELP.md
+
+# Spring Boot
+.springBeans
+.sts4-cache
+
+###############################################################################
+# IDE Configuration
+###############################################################################
+
+# VS Code
+.vscode/
+*.vscode
+
+# IntelliJ IDEA
+.idea
+*.iws
+*.iml
+*.ipr
+
+# Eclipse/STS
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/nbdist/
+/.nb-gradle/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Claude
+*.claude
+
+###############################################################################
+# Environment & Security
+###############################################################################
+
+# Environment files
+.env*
+!.env.example
+
+# Credentials & Secrets
+*.pem
+*.key
+*.cert
+credentials.json
+
+###############################################################################
+# Operating System
+###############################################################################
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
