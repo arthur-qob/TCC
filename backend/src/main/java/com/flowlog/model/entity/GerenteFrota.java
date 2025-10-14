@@ -17,7 +17,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name = "gerentes")
-public class Gerente extends Papel {
+public class GerenteFrota extends Papel {
 
 	@OneToMany(mappedBy = "gerenteInicializador")
 	private Set<Pedido> pedidosAbertos = new HashSet<>();

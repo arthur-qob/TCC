@@ -35,14 +35,18 @@ public class Pedido {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	private Long id;
 
-	@Column(name = "data_execucao")
+	@Column(name = "data_execucao") // Data de saída de entrega | Colocar hora?
 	private LocalDate dataExecucao;
 
 	@Column(name = "tipo_carga", nullable = false)
 	@Enumerated(EnumType.STRING)
 	private TiposCarga tipoCarga;
+
+	// Caso o tipo de carga seja CONTAINER, pedir o número de container
+	@Column(name = "num_container")
+	private String numContainer;
 
 	@Column(name = "qtd_carretas", nullable = false)
 	private Integer qtdCarretas;
@@ -65,11 +69,15 @@ public class Pedido {
 
 	@ManyToOne
 	@JoinColumn(name = "gerente_inicializador")
-	private Gerente gerenteInicializador;
+	private GerenteFrota gerenteInicializador;
 
 	@ManyToOne
 	@JoinColumn(name = "gerente_revisor")
-	private Gerente gerenteRevisor;
+	private GerenteFrota gerenteRevisor;
+
+	@ManyToOne
+	@JoinColumn(name = "gerente_risco")
+	private GerenteRisco gerenteRisco;
 
 	@ManyToOne
 	@JoinColumn(name = "motorista_id")

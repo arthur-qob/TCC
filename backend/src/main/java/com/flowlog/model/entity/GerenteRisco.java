@@ -1,7 +1,10 @@
 package com.flowlog.model.entity;
 
-import jakarta.persistence.Column;
+import java.util.HashSet;
+import java.util.Set;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,11 +16,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "containers")
-public class Container extends Carga {
+@Table(name = "gerente_risco")
+public class GerenteRisco extends Papel {
 
-	@Column(name = "num_container", nullable = false)
-	private String numContainer;
-
-	// Adicionar peso e link para cliente?
+	@OneToMany(mappedBy = "gerenteRisco")
+	private Set<Pedido> pedidos = new HashSet<>();
 }

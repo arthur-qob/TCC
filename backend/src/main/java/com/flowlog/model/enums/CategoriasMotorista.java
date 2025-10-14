@@ -1,6 +1,6 @@
 package com.flowlog.model.enums;
 
 public enum CategoriasMotorista {
-	C,
+	D,
 	E
 }
