@@ -43,10 +43,14 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 
 	useEffect(() => {
 		localStorage.setItem('theme', theme)
-		document.documentElement.classList.toggle('dark', actualTheme === 'dark')
+		document.documentElement.classList.toggle(
+			'dark',
+			actualTheme === 'dark'
+		)
 
 		// Set body background color based on theme
-		document.body.style.backgroundColor = actualTheme === 'dark' ? '#000000' : '#f3f4f6'
+		document.body.style.backgroundColor =
+			actualTheme === 'dark' ? '#000000' : '#f3f4f6'
 		document.body.style.transition = 'background-color 0.2s'
 	}, [theme, actualTheme])
 
@@ -59,7 +63,8 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 	}
 
 	return (
-		<ThemeContext.Provider value={{ theme, toggleTheme, setTheme, actualTheme }}>
+		<ThemeContext.Provider
+			value={{ theme, toggleTheme, setTheme, actualTheme }}>
 			{children}
 		</ThemeContext.Provider>
 	)

@@ -1,7 +1,11 @@
 import { Route, Routes, Navigate } from 'react-router-dom'
 import Login from './pages/login'
 import HomePage from './pages'
-import CadastrarPedido from './pages/cadastPedido'
+import CreatePedidoPage from './pages/createPedido'
+import CreateUsuarioPage from './pages/admin/createUsuario'
+
+// Fazer função que verifica o papel (role) do usuário
+// Fazer função que verifica se o usuário está logado
 
 const AppRoutes = () => {
 	return (
@@ -24,8 +28,12 @@ const AppRoutes = () => {
 				element={<HomePage />}
 			/>
 			<Route
-				path='/cadastrarPedido'
-				element={<CadastrarPedido />}
+				path='/cadastrar-pedido'
+				element={<CreatePedidoPage />}
+			/>
+			<Route
+				path='/admin/cadastrar-usuario'
+				element={<CreateUsuarioPage />}
 			/>
 		</Routes>
 	)

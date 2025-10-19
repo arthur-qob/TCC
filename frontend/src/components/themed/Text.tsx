@@ -40,8 +40,30 @@ const Text = ({
 		}
 	}
 
+	const getElementStyles = () => {
+		switch (Component) {
+			case 'h1':
+				return 'text-4xl font-bold'
+			case 'h2':
+				return 'text-3xl font-bold'
+			case 'h3':
+				return 'text-2xl font-semibold'
+			case 'h4':
+				return 'text-xl font-semibold'
+			case 'h5':
+				return 'text-lg font-medium'
+			case 'h6':
+				return 'text-base font-medium'
+			case 'p':
+			case 'span':
+			default:
+				return ''
+		}
+	}
+
 	return (
-		<Component className={`${baseStyles} ${getVariantStyles()} ${className}`}>
+		<Component
+			className={`${baseStyles} ${getVariantStyles()} ${getElementStyles()} ${className}`}>
 			{children}
 		</Component>
 	)

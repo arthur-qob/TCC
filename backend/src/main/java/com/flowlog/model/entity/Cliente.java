@@ -43,7 +43,7 @@ public class Cliente {
 	@Column(name = "cnpj")
 	private String cnpj;
 
-	@ManyToOne
+	@OneToMany(mappedBy = "cliente")
 	private Set<Rota> rotas = new HashSet<>();
 
 	@OneToMany(mappedBy = "cliente")

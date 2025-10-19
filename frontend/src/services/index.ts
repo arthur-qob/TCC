@@ -1,0 +1,5 @@
+export { clientService } from './clienteService'
+export { fleetService } from './frotaService'
+export { driverService } from './motoristaService'
+export { orderService } from './pedidoService'
+export { default as api } from './api'

@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import Sidebar from './components/sidebar'
-import ScrollToTop from './components/ScrollToTop'
+import ScrollToTop from './components/scrollToTop'
 import AppRoutes from './routes'
 import AOS from 'aos'
 import 'aos/dist/aos.css'

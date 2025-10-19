@@ -1,2 +1,2 @@
-export { default as Container } from './Container'
-export { default as Text } from './Text'
+export { default as Container } from './container'
+export { default as Text } from './text'
