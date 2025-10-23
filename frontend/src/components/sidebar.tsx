@@ -16,6 +16,9 @@ import {
 } from 'lucide-react'
 import { useTheme } from '../context/theme'
 import { useNavigate } from 'react-router-dom'
+import { useUser } from '../context/user'
+import { sidebarRoutesPerRole } from '../routes'
+import { useMemo } from 'react'
 
 interface MenuItem {
 	icon: React.ComponentType<{ size?: number; className?: string }>
@@ -33,15 +36,38 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 	const [isCollapsed, setIsCollapsed] = useState(true)
 	const { theme, toggleTheme, actualTheme } = useTheme()
 	const navigate = useNavigate()
+	const { user } = useUser()
 
-	const menuItems: MenuItem[] = [
-		{ icon: Home, label: 'Dashboard', href: '/dashboard' },
-		{ icon: Users, label: 'Usuários', href: '#' },
-		{ icon: BarChart2, label: 'Relatórios', href: '#' },
-		{ icon: FileText, label: 'Documentos', href: '#' },
-		{ icon: Bell, label: 'Notificações', href: '#', badge: 3 },
-		{ icon: Settings, label: 'Configurações', href: '#' }
-	]
+	// Map menu labels to icons
+	const iconMap: Record<
+		string,
+		React.ComponentType<{ size?: number; className?: string }>
+	> = {
+		Dashboard: Home,
+		Usuários: Users,
+		'Cadastrar Usuário': Users,
+		Relatórios: BarChart2,
+		Documentos: FileText,
+		Notificações: Bell,
+		Configurações: Settings
+	}
+
+	// Generate menu items based on user role
+	const menuItems: MenuItem[] = useMemo(() => {
+		if (!user?.role) return []
+
+		const routes =
+			sidebarRoutesPerRole[
+				user?.role as keyof typeof sidebarRoutesPerRole
+			]
+		if (!routes) return []
+
+		return Object.entries(routes).map(([label, href]) => ({
+			icon: iconMap[label] || Home,
+			label,
+			href
+		}))
+	}, [user?.role])
 
 	const handleNavigation = () => {
 		if (window.innerWidth < 1024) {
@@ -111,7 +137,7 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 							alt='FlowLog'
 							className='h-8 w-auto object-contain'
 						/>
-						<div className='flex items-center gap-2 mt-2'>
+						{/* <div className='flex items-center gap-2 mt-2'>
 							<span
 								className={`text-xs whitespace-nowrap ${
 									actualTheme === 'dark'
@@ -129,7 +155,7 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 									className='h-4 w-auto object-contain'
 								/>
 							</a>
-						</div>
+						</div> */}
 					</div>
 
 					{/* Desktop Collapse Toggle */}
@@ -159,13 +185,13 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 					<ul className='space-y-2'>
 						{menuItems.map((item, index) => (
 							<li key={index}>
-								<span
+								<button
 									onClick={() => {
 										navigate(item.href)
-										handleNavigation
+										handleNavigation()
 									}}
-									className={`flex items-center gap-3 px-4 py-3 rounded-lg
-										transition-all group relative
+									className={`flex items-center gap-3 px-4 py-3 rounded-lg w-full
+										transition-all group relative cursor-pointer
 										focus:outline-none focus:ring-2 focus:ring-red-500
 										${actualTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-300'}`}
 									title={isCollapsed ? item.label : ''}>
@@ -193,7 +219,7 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 									{item.badge && isCollapsed && (
 										<span className='absolute -top-1 -right-1 w-3 h-3 bg-red-600 text-white rounded-full' />
 									)}
-								</span>
+								</button>
 							</li>
 						))}
 					</ul>
@@ -218,8 +244,17 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 						}`}>
 						<div
 							className='w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center flex-shrink-0'
-							title='Fábio Ramos'>
-							<span className='text-sm font-bold'>FR</span>
+							title={user?.nome || 'Usuário'}>
+							<span className='text-sm font-bold'>
+								{user?.nome
+									? user.nome
+											.split(' ')
+											.map((n) => n[0])
+											.join('')
+											.toUpperCase()
+											.slice(0, 2)
+									: 'U'}
+							</span>
 						</div>
 						<div
 							className={`flex-1 transition-all overflow-hidden ${
@@ -228,7 +263,7 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 									: 'w-auto opacity-100'
 							}`}>
 							<p className='text-sm font-medium whitespace-nowrap'>
-								Fábio Ramos
+								{user?.nome || 'Usuário'}
 							</p>
 							<p
 								className={`text-xs whitespace-nowrap ${
@@ -236,7 +271,7 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 										? 'text-gray-400'
 										: 'text-gray-500'
 								}`}>
-								fabioramos@ziranlog.com.br
+								{user?.email || 'email@exemplo.com'}
 							</p>
 						</div>
 					</div>
@@ -291,10 +326,12 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 					</button>
 
 					{/* Logout Button */}
-					<button
-						className={`mt-2 w-full flex items-center ${
-							isCollapsed ? '' : 'gap-3'
-						} px-4 py-3 rounded-lg
+					{user && (
+						<>
+							<button
+								className={`mt-2 w-full flex items-center ${
+									isCollapsed ? '' : 'gap-3'
+								} px-4 py-3 rounded-lg
 							${
 								actualTheme === 'dark'
 									? 'hover:bg-red-800/30'
@@ -302,21 +339,24 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 							} text-red-400 transition-colors
 							focus:outline-none focus:ring-2 focus:ring-red-500
 							${isCollapsed ? 'justify-center' : ''}`}
-						title={isCollapsed ? 'Sair' : ''}
-						aria-label='Sair'>
-						<LogOut
-							size={20}
-							className='flex-shrink-0'
-						/>
-						<span
-							className={`font-medium transition-all ${
-								isCollapsed
-									? 'w-0 opacity-0'
-									: 'w-auto opacity-100'
-							} whitespace-nowrap overflow-hidden`}>
-							Sair
-						</span>
-					</button>
+								title={isCollapsed ? 'Sair' : ''}
+								aria-label='Sair'>
+								<LogOut
+									size={20}
+									className='flex-shrink-0'
+								/>
+
+								<span
+									className={`font-medium transition-all ${
+										isCollapsed
+											? 'w-0 opacity-0'
+											: 'w-auto opacity-100'
+									} whitespace-nowrap overflow-hidden`}>
+									Sair
+								</span>
+							</button>
+						</>
+					)}
 				</div>
 			</aside>
 		</>

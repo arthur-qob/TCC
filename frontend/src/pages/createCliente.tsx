@@ -1,23 +1,19 @@
 import { useState } from 'react'
-import CustomSelect from '../../components/select'
-import { Container, Text } from '../../components/themed'
-import { useTheme } from '../../context/theme'
-import { CategoriasMotorista, TiposUsuario } from '../../types'
+import CustomSelect from '../components/select'
+import { Container, Text } from '../components/themed'
+import { useTheme } from '../context/theme'
 
-const CreateUsuarioPage = () => {
+const CreateClientePage = () => {
 	const { actualTheme } = useTheme()
 
 	const [nome, setNome] = useState<string>('')
 	const [email, setEmail] = useState<string>('')
-	const [selectedRole, setSelectedRole] = useState<TiposUsuario | null>(null)
-	const [categHabilitacao, setCategHabilitacao] =
-		useState<CategoriasMotorista | null>(null)
+	const [cpf, setCpf] = useState<string>('')
 
 	const handleLimpar = () => {
 		setNome('')
 		setEmail('')
-		setSelectedRole(null)
-		setCategHabilitacao(null)
+		setCpf('')
 	}
 
 	const inputClassName = `w-full rounded-lg border px-3 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 ${
@@ -37,7 +33,7 @@ const CreateUsuarioPage = () => {
 			<Text
 				as='h1'
 				className='font-normal'>
-				Cadastrar Usuário
+				Cadastrar Cliente
 			</Text>
 
 			<form
@@ -90,82 +86,20 @@ const CreateUsuarioPage = () => {
 
 						<div className='space-y-2'>
 							<label
-								htmlFor='role'
+								htmlFor='cpf'
 								className={labelClassName}>
-								Papel do Usuário{' '}
-								<span className='text-red-500'>*</span>
+								CPF <span className='text-red-500'>*</span>
 							</label>
-							<CustomSelect
-								id='role'
-								defaultValue={selectedRole || ''}
-								options={TiposUsuario}
-								onChange={(value) => {
-									if (
-										Object.values(TiposUsuario).includes(
-											value as TiposUsuario
-										)
-									) {
-										setSelectedRole(value as TiposUsuario)
-									}
-								}}
-								placeholder='Selecione o papel do usuário'
+							<input
+								type='text'
+								name='cpf'
+								id='cpf'
+								value={cpf}
+								onChange={() => {}}
+								className={inputClassName}
+								placeholder='XXX.XXX.XXX-XX'
 							/>
 						</div>
-
-						{selectedRole === TiposUsuario.MOTORISTA && (
-							<div
-								className='space-y-5 pt-4 border-t'
-								style={{
-									borderColor:
-										actualTheme === 'dark'
-											? '#333'
-											: '#e5e5e5'
-								}}>
-								<h3
-									className={`text-lg font-medium ${
-										actualTheme === 'dark'
-											? 'text-gray-200'
-											: 'text-gray-800'
-									}`}>
-									Informações do Motorista
-								</h3>
-
-								<div className='space-y-2'>
-									<label
-										htmlFor='frota'
-										className={labelClassName}>
-										Frota{' '}
-										<span className='text-red-500'>*</span>
-									</label>
-									<input
-										id='frota'
-										type='text'
-										className={inputClassName}
-										placeholder='Código ou nome da frota'
-									/>
-								</div>
-
-								<div className='space-y-2'>
-									<label
-										htmlFor='habilitacao'
-										className={labelClassName}>
-										Categoria de Habilitação{' '}
-										<span className='text-red-500'>*</span>
-									</label>
-									<CustomSelect
-										id='habilitacao'
-										defaultValue=''
-										options={CategoriasMotorista}
-										onChange={(value) =>
-											setCategHabilitacao(
-												value as CategoriasMotorista
-											)
-										}
-										placeholder='Selecione a categoria'
-									/>
-								</div>
-							</div>
-						)}
 					</section>
 
 					{/* Profile Picture Section */}
@@ -247,7 +181,7 @@ const CreateUsuarioPage = () => {
 							e.currentTarget.style.backgroundColor =
 								actualTheme === 'dark' ? '#16a34a' : '#22c55e'
 						}}>
-						Cadastrar Usuário
+						Cadastrar Cliente
 					</button>
 				</div>
 			</form>
@@ -255,4 +189,4 @@ const CreateUsuarioPage = () => {
 	)
 }
 
-export default CreateUsuarioPage
+export default CreateClientePage

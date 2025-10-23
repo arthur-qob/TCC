@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import type { ReactNode } from 'react'
-import type { UsuarioDTO, UserRole } from '../types'
+import type { UsuarioDTO, TiposUsuario } from '../types'
 import { authService } from '../services/authService'
 
 interface UserContextType {
@@ -8,7 +8,7 @@ interface UserContextType {
 	loading: boolean
 	error: string | null
 	setUser: (user: UsuarioDTO | null) => void
-	getRole: () => UserRole | null
+	getRole: () => TiposUsuario | null
 	isAuthenticated: () => boolean
 	loadUser: () => Promise<void>
 	clearUser: () => void
@@ -40,7 +40,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 		}
 	}
 
-	const getRole = (): UserRole | null => {
+	const getRole = (): TiposUsuario | null => {
 		return user?.role || null
 	}
 
@@ -127,12 +127,12 @@ export const useUser = (): UserContextType => {
 	return context
 }
 
-export const useIsRole = (role: UserRole): boolean => {
+export const useIsRole = (role: TiposUsuario): boolean => {
 	const { user } = useUser()
 	return user?.role === role
 }
 
-export const useHasAnyRole = (roles: UserRole[]): boolean => {
+export const useHasAnyRole = (roles: TiposUsuario[]): boolean => {
 	const { user } = useUser()
 	return user !== null && roles.includes(user.role)
 }

@@ -19,6 +19,7 @@ import { useState } from 'react'
 import { Container, Text } from '../components/themed'
 import { useTheme } from '../context/theme'
 import { useNavigate } from 'react-router-dom'
+import { useUser } from '../context/user'
 
 interface OrderData {
 	id: number
@@ -34,7 +35,7 @@ type SortField = keyof Omit<OrderData, 'id'>
 type SortDirection = 'asc' | 'desc' | null
 
 const HomePage = () => {
-	const role: string = 'focal'
+	const { user } = useUser()
 	const ordersData: OrderData[] = [
 		{
 			id: 1,
@@ -180,13 +181,16 @@ const HomePage = () => {
 	const orders = sortedOrders
 
 	const roleActions: Record<string, React.JSX.Element> = {
-		focal: (
+		FOCAL: (
 			<Eye className='mx-auto text-blue-500 hover:text-blue-600 transition-colors duration-300' />
 		),
-		programador: (
+		PROGRAMADOR: (
 			<UserPlus className='mx-auto text-blue-500 hover:text-blue-600 transition-colors duration-300'></UserPlus>
 		),
-		gerente: (
+		GERENTE_FROTA: (
+			<SquarePen className='mx-auto text-blue-500 hover:text-blue-600 transition-colors duration-300' />
+		),
+		ADMIN: (
 			<SquarePen className='mx-auto text-blue-500 hover:text-blue-600 transition-colors duration-300' />
 		)
 	}
@@ -194,9 +198,11 @@ const HomePage = () => {
 	return (
 		<Container>
 			<Text className='w-fit capitalize text-2xl font-medium'>
-				{role}
+				{user?.role || 'No user'}
 			</Text>
-			{(role === 'focal' || role === 'gerente') && (
+			{(user?.role === 'FOCAL' ||
+				user?.role === 'GERENTE_FROTA' ||
+				user?.role === 'ADMIN') && (
 				<button
 					className='w-fit bg-[rgb(15,219,110)] hover:bg-[hsla(149,87%,40%,1.00)] transition-colors duration-300 text-white px-2 py-3 rounded-xl shadow-lg'
 					onClick={() => navigate('/cadastrar-pedido')}>
@@ -324,7 +330,8 @@ const HomePage = () => {
 									{getSortIcon('client')}
 								</div>
 							</TableCell>
-							{role === 'gerente' && (
+							{(user?.role === 'GERENTE_FROTA' ||
+								user?.role === 'ADMIN') && (
 								<TableCell
 									align='center'
 									sx={{
@@ -333,7 +340,9 @@ const HomePage = () => {
 											actualTheme === 'dark'
 												? '#ffffff'
 												: '#000000'
-									}}></TableCell>
+									}}>
+									AÇÕES
+								</TableCell>
 							)}
 						</TableRow>
 					</TableHead>
@@ -361,7 +370,7 @@ const HomePage = () => {
 									}}>
 									{order.driver ? (
 										order.driver
-									) : role === 'focal' ? (
+									) : user?.role === 'FOCAL' ? (
 										'Não definido'
 									) : (
 										<UserPlus className='mx-auto text-blue-500 hover:text-blue-600 transition-colors duration-300'></UserPlus>
@@ -419,7 +428,8 @@ const HomePage = () => {
 									}}>
 									{order.client}
 								</TableCell>
-								{role === 'gerente' && (
+								{(user?.role === 'GERENTE_FROTA' ||
+									user?.role === 'ADMIN') && (
 									<TableCell
 										align='center'
 										sx={{
@@ -428,7 +438,7 @@ const HomePage = () => {
 													? '#ffffff'
 													: '#000000'
 										}}>
-										{roleActions[role]}
+										{user?.role && roleActions[user.role]}
 									</TableCell>
 								)}
 							</TableRow>

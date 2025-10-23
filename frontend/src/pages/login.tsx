@@ -139,14 +139,14 @@ const Login = () => {
 							'Login'
 						)}
 					</button>
-					<div className='flex items-center justify-center mt-4 gap-2'>
+					{/* <div className='flex items-center justify-center mt-4 gap-2'>
 						<p className='text-xs sm:text-sm'>Powered by </p>
 						<img
 							src='/logo_flowlog.png'
 							alt='Logo FlowLog'
 							className='h-6 sm:h-8 w-auto object-contain'
 						/>
-					</div>
+					</div> */}
 				</section>
 			</div>
 		</div>

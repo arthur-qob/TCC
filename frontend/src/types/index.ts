@@ -7,6 +7,12 @@ export const StatusFrota = {
 
 export type StatusFrota = (typeof StatusFrota)[keyof typeof StatusFrota]
 
+export const TiposFrota = {
+	// Colocar tipos da frota
+}
+
+export type TiposFrota = (typeof TiposFrota)[keyof typeof TiposFrota]
+
 export const StatusMotorista = {
 	ATIVO: 'ATIVO',
 	INATIVO: 'INATIVO',
@@ -18,8 +24,6 @@ export type StatusMotorista =
 	(typeof StatusMotorista)[keyof typeof StatusMotorista]
 
 export const CategoriasMotorista = {
-	A: 'A',
-	B: 'B',
 	C: 'C',
 	D: 'D',
 	E: 'E'
@@ -140,7 +144,7 @@ export interface PedidoCreateDTO {
 }
 
 // User types
-export const UserRole = {
+export const TiposUsuario = {
 	CLIENTE: 'CLIENTE',
 	MOTORISTA: 'MOTORISTA',
 	FOCAL: 'FOCAL',
@@ -150,13 +154,13 @@ export const UserRole = {
 	ADMIN: 'ADMIN'
 } as const
 
-export type UserRole = (typeof UserRole)[keyof typeof UserRole]
+export type TiposUsuario = (typeof TiposUsuario)[keyof typeof TiposUsuario]
 
 export interface BaseUserDTO {
 	id: number
 	nome: string
 	email: string
-	role: UserRole
+	role: TiposUsuario
 }
 
 export interface PapelUserDTO extends BaseUserDTO {
