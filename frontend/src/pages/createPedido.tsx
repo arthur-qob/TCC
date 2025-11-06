@@ -6,7 +6,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { ptBR } from 'date-fns/locale'
 import CustomSelect from '../components/select'
-import { TiposCarga, TiposOperacao } from '../types'
+import { TipoCarga, TipoOperacao } from '../utils/types'
 import { useNavigate } from 'react-router-dom'
 
 const CreatePedidoPage = () => {
@@ -113,11 +113,11 @@ const CreatePedidoPage = () => {
 
 				{/* Tipo da carga */}
 				<Text>Tipo da carga</Text>
-				<CustomSelect options={TiposCarga} />
+				<CustomSelect options={TipoCarga} />
 
 				{/* Operação */}
 				<Text>Operação</Text>
-				<CustomSelect options={TiposOperacao} />
+				<CustomSelect options={TipoOperacao} />
 
 				{/* Buttons */}
 				<div className='flex justify-end gap-4 pt-4'>

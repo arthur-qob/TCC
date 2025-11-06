@@ -8,12 +8,12 @@ import { UserProvider } from './context/user.tsx'
 
 createRoot(document.getElementById('root')!).render(
 	<StrictMode>
-		<ThemeProvider>
-			<UserProvider>
+		<UserProvider>
+			<ThemeProvider>
 				<BrowserRouter>
 					<App />
 				</BrowserRouter>
-			</UserProvider>
-		</ThemeProvider>
+			</ThemeProvider>
+		</UserProvider>
 	</StrictMode>
 )

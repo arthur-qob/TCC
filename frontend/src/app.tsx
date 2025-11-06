@@ -2,13 +2,13 @@ import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import Sidebar from './components/sidebar'
 import ScrollToTop from './components/scrollToTop'
-import AppRoutes from './routes'
+import AppRoutes from './utils/routes'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 
 const App = () => {
 	const location = useLocation()
-	const noSidebarRoutes = ['/', '/login']
+	const noSidebarRoutes = ['/', '/signin']
 
 	useEffect(() => {
 		AOS.init({

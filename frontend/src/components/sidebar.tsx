@@ -17,7 +17,7 @@ import {
 import { useTheme } from '../context/theme'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../context/user'
-import { sidebarRoutesPerRole } from '../routes'
+import { sidebarRoutesPerRole } from '../utils/routes'
 import { useMemo } from 'react'
 
 interface MenuItem {
@@ -36,7 +36,7 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 	const [isCollapsed, setIsCollapsed] = useState(true)
 	const { theme, toggleTheme, actualTheme } = useTheme()
 	const navigate = useNavigate()
-	const { user } = useUser()
+	const { user, logout } = useUser()
 
 	// Map menu labels to icons
 	const iconMap: Record<
@@ -54,11 +54,11 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 
 	// Generate menu items based on user role
 	const menuItems: MenuItem[] = useMemo(() => {
-		if (!user?.role) return []
+		if (!user?.tipo) return []
 
 		const routes =
 			sidebarRoutesPerRole[
-				user?.role as keyof typeof sidebarRoutesPerRole
+				user?.tipo as keyof typeof sidebarRoutesPerRole
 			]
 		if (!routes) return []
 
@@ -67,7 +67,7 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 			label,
 			href
 		}))
-	}, [user?.role])
+	}, [user?.tipo])
 
 	const handleNavigation = () => {
 		if (window.innerWidth < 1024) {
@@ -244,10 +244,10 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 						}`}>
 						<div
 							className='w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center flex-shrink-0'
-							title={user?.nome || 'Usuário'}>
+							title={user?.name || 'Usuário'}>
 							<span className='text-sm font-bold'>
-								{user?.nome
-									? user.nome
+								{user?.name
+									? user.name
 											.split(' ')
 											.map((n) => n[0])
 											.join('')
@@ -263,7 +263,7 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 									: 'w-auto opacity-100'
 							}`}>
 							<p className='text-sm font-medium whitespace-nowrap'>
-								{user?.nome || 'Usuário'}
+								{user?.name || 'Usuário'}
 							</p>
 							<p
 								className={`text-xs whitespace-nowrap ${
@@ -329,6 +329,10 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 					{user && (
 						<>
 							<button
+								onClick={async () => {
+									await logout()
+									navigate('/signin')
+								}}
 								className={`mt-2 w-full flex items-center ${
 									isCollapsed ? '' : 'gap-3'
 								} px-4 py-3 rounded-lg

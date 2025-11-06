@@ -1,23 +1,116 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import CustomSelect from '../../components/select'
 import { Container, Text } from '../../components/themed'
 import { useTheme } from '../../context/theme'
-import { CategoriasMotorista, TiposUsuario } from '../../types'
+import type { UserRole } from '../../utils/types'
+import {
+	CategoriasMotorista,
+	StatusMotorista,
+	UserRoles
+} from '../../utils/types'
+import { userService } from '../../services/userService'
 
 const CreateUsuarioPage = () => {
 	const { actualTheme } = useTheme()
+	const navigate = useNavigate()
 
 	const [nome, setNome] = useState<string>('')
 	const [email, setEmail] = useState<string>('')
-	const [selectedRole, setSelectedRole] = useState<TiposUsuario | null>(null)
+	const [password, setPassword] = useState<string>('')
+	const [selectedRole, setSelectedRole] = useState<UserRole | null>(null)
 	const [categHabilitacao, setCategHabilitacao] =
 		useState<CategoriasMotorista | null>(null)
+	const [statusMotorista, setStatusMotorista] = useState<StatusMotorista>(
+		StatusMotorista.ATIVO
+	)
+	const [frotaId, setFrotaId] = useState<string>('')
+	const [isLoading, setIsLoading] = useState(false)
+	const [error, setError] = useState<string | null>(null)
 
 	const handleLimpar = () => {
 		setNome('')
 		setEmail('')
+		setPassword('')
 		setSelectedRole(null)
 		setCategHabilitacao(null)
+		setStatusMotorista(StatusMotorista.ATIVO)
+		setFrotaId('')
+		setError(null)
+	}
+
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault()
+		setError(null)
+
+		// Validation
+		if (!nome || !email || !password || !selectedRole) {
+			setError('Por favor, preencha todos os campos obrigatórios')
+			return
+		}
+
+		if (password.length < 6) {
+			setError('A senha deve ter no mínimo 6 caracteres')
+			return
+		}
+
+		if (selectedRole === UserRoles.MOTORISTA && !categHabilitacao) {
+			setError('Por favor, selecione a categoria de habilitação')
+			return
+		}
+
+		setIsLoading(true)
+
+		try {
+			const baseData = {
+				name: nome,
+				email,
+				password,
+				dataInicio: new Date().toISOString().split('T')[0]
+			}
+
+			switch (selectedRole) {
+				case UserRoles.ADMIN:
+					await userService.createAdmin(baseData)
+					break
+				case UserRoles.PROGRAMADOR:
+					await userService.createProgramador(baseData)
+					break
+				case UserRoles.MOTORISTA:
+					await userService.createMotorista({
+						...baseData,
+						categoria: categHabilitacao!,
+						status: statusMotorista,
+						frotaId: frotaId ? parseInt(frotaId) : undefined
+					})
+					break
+				case UserRoles.GERENTE_FROTA:
+					await userService.createGerenteFrota(baseData)
+					break
+				case UserRoles.GERENTE_RISCO:
+					await userService.createGerenteRisco(baseData)
+					break
+				case UserRoles.FOCAL:
+					await userService.createFocal(baseData)
+					break
+				default:
+					throw new Error('Tipo de usuário inválido')
+			}
+
+			// Success - clear form and navigate
+			handleLimpar()
+			alert('Usuário criado com sucesso!')
+			navigate('/admin/users')
+		} catch (err: any) {
+			console.error('Error creating user:', err)
+			const errorMessage =
+				err.response?.data?.message ||
+				err.response?.data?.errors?.[0] ||
+				'Erro ao criar usuário. Tente novamente.'
+			setError(errorMessage)
+		} finally {
+			setIsLoading(false)
+		}
 	}
 
 	const inputClassName = `w-full rounded-lg border px-3 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 ${
@@ -30,8 +123,6 @@ const CreateUsuarioPage = () => {
 		actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
 	}`
 
-	const handleSubmit = () => {}
-
 	return (
 		<Container>
 			<Text
@@ -40,7 +131,7 @@ const CreateUsuarioPage = () => {
 				Cadastrar Usuário
 			</Text>
 
-			<form
+			<div
 				className='rounded-xl shadow-lg p-8'
 				style={{
 					backgroundColor:
@@ -52,6 +143,14 @@ const CreateUsuarioPage = () => {
 				<form
 					onSubmit={handleSubmit}
 					className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
+					{error && (
+						<div className='lg:col-span-3 p-4 rounded-lg bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700'>
+							<p className='text-red-700 dark:text-red-300 text-sm'>
+								{error}
+							</p>
+						</div>
+					)}
+
 					<section className='lg:col-span-2 space-y-5'>
 						<div className='space-y-2'>
 							<label
@@ -68,6 +167,7 @@ const CreateUsuarioPage = () => {
 								onChange={(e) => setNome(e.target.value)}
 								className={inputClassName}
 								placeholder='Digite o nome completo'
+								required
 							/>
 						</div>
 
@@ -85,6 +185,26 @@ const CreateUsuarioPage = () => {
 								onChange={(e) => setEmail(e.target.value)}
 								className={inputClassName}
 								placeholder='usuario@exemplo.com'
+								required
+							/>
+						</div>
+
+						<div className='space-y-2'>
+							<label
+								htmlFor='password'
+								className={labelClassName}>
+								Senha <span className='text-red-500'>*</span>
+							</label>
+							<input
+								type='password'
+								name='password'
+								id='password'
+								value={password}
+								onChange={(e) => setPassword(e.target.value)}
+								className={inputClassName}
+								placeholder='Mínimo 6 caracteres'
+								minLength={6}
+								required
 							/>
 						</div>
 
@@ -98,21 +218,21 @@ const CreateUsuarioPage = () => {
 							<CustomSelect
 								id='role'
 								defaultValue={selectedRole || ''}
-								options={TiposUsuario}
+								options={UserRoles}
 								onChange={(value) => {
 									if (
-										Object.values(TiposUsuario).includes(
-											value as TiposUsuario
+										Object.values(UserRoles).includes(
+											value as UserRole
 										)
 									) {
-										setSelectedRole(value as TiposUsuario)
+										setSelectedRole(value as UserRole)
 									}
 								}}
 								placeholder='Selecione o papel do usuário'
 							/>
 						</div>
 
-						{selectedRole === TiposUsuario.MOTORISTA && (
+						{selectedRole === UserRoles.MOTORISTA && (
 							<div
 								className='space-y-5 pt-4 border-t'
 								style={{
@@ -134,14 +254,37 @@ const CreateUsuarioPage = () => {
 									<label
 										htmlFor='frota'
 										className={labelClassName}>
-										Frota{' '}
-										<span className='text-red-500'>*</span>
+										Frota ID
 									</label>
 									<input
 										id='frota'
-										type='text'
+										type='number'
+										value={frotaId}
+										onChange={(e) =>
+											setFrotaId(e.target.value)
+										}
 										className={inputClassName}
-										placeholder='Código ou nome da frota'
+										placeholder='ID da frota (opcional)'
+									/>
+								</div>
+
+								<div className='space-y-2'>
+									<label
+										htmlFor='status'
+										className={labelClassName}>
+										Status{' '}
+										<span className='text-red-500'>*</span>
+									</label>
+									<CustomSelect
+										id='status'
+										defaultValue={statusMotorista}
+										options={StatusMotorista}
+										onChange={(value) =>
+											setStatusMotorista(
+												value as StatusMotorista
+											)
+										}
+										placeholder='Selecione o status'
 									/>
 								</div>
 
@@ -233,24 +376,33 @@ const CreateUsuarioPage = () => {
 					</button>
 					<button
 						type='submit'
-						className='px-6 py-2.5 rounded-lg font-medium transition-all duration-200 hover:shadow-md active:scale-95'
+						disabled={isLoading}
+						className='px-6 py-2.5 rounded-lg font-medium transition-all duration-200 hover:shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed'
 						style={{
 							backgroundColor:
 								actualTheme === 'dark' ? '#16a34a' : '#22c55e',
 							color: '#ffffff'
 						}}
 						onMouseEnter={(e) => {
-							e.currentTarget.style.backgroundColor =
-								actualTheme === 'dark' ? '#15803d' : '#16a34a'
+							if (!isLoading) {
+								e.currentTarget.style.backgroundColor =
+									actualTheme === 'dark'
+										? '#15803d'
+										: '#16a34a'
+							}
 						}}
 						onMouseLeave={(e) => {
-							e.currentTarget.style.backgroundColor =
-								actualTheme === 'dark' ? '#16a34a' : '#22c55e'
+							if (!isLoading) {
+								e.currentTarget.style.backgroundColor =
+									actualTheme === 'dark'
+										? '#16a34a'
+										: '#22c55e'
+							}
 						}}>
-						Cadastrar Usuário
+						{isLoading ? 'Cadastrando...' : 'Cadastrar Usuário'}
 					</button>
 				</div>
-			</form>
+			</div>
 		</Container>
 	)
 }

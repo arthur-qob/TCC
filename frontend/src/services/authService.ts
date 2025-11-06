@@ -1,38 +1,24 @@
-import api from './api'
-import type { LoginDTO, LoginResponseDTO, UsuarioDTO } from '../types/index'
+import type { LoginRequest, SignupRequest } from '../utils/types/auth.types'
+import type { Usuario } from '../utils/types/user.types'
+import { api } from '../utils/api'
 
 export const authService = {
-	// Login
-	login: async (credentials: LoginDTO): Promise<LoginResponseDTO> => {
-		const response = await api.post<LoginResponseDTO>(
-			'/auth/login',
-			credentials
-		)
+	async signin(credentials: LoginRequest): Promise<Usuario> {
+		const response = await api.post<Usuario>('/auth/signin', credentials)
 		return response.data
 	},
 
-	// Obter dados do usuário atual
-	getCurrentUser: async (): Promise<UsuarioDTO> => {
-		const response = await api.get<UsuarioDTO>('/auth/me')
+	async signup(data: SignupRequest): Promise<Usuario> {
+		const response = await api.post<Usuario>('/auth/signup', data)
 		return response.data
 	},
 
-	// Logout (se houver endpoint no backend)
-	logout: async (): Promise<void> => {
-		try {
-			await api.post('/auth/logout')
-		} catch (error) {
-			console.error('Erro ao fazer logout no backend:', error)
-		}
+	async logout(): Promise<void> {
+		await api.post('/auth/logout')
 	},
 
-	// Verificar se o token ainda é válido
-	validateToken: async (): Promise<boolean> => {
-		try {
-			await api.get('/auth/validate')
-			return true
-		} catch (error) {
-			return false
-		}
+	async getCurrentUser(): Promise<Usuario> {
+		const response = await api.get<Usuario>('/auth/me')
+		return response.data
 	}
 }

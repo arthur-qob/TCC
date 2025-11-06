@@ -20,6 +20,7 @@ import { Container, Text } from '../components/themed'
 import { useTheme } from '../context/theme'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../context/user'
+import { UserRoles } from '../utils/types'
 
 interface OrderData {
 	id: number
@@ -198,11 +199,11 @@ const HomePage = () => {
 	return (
 		<Container>
 			<Text className='w-fit capitalize text-2xl font-medium'>
-				{user?.role || 'No user'}
+				{user?.tipo || 'No user'}
 			</Text>
-			{(user?.role === 'FOCAL' ||
-				user?.role === 'GERENTE_FROTA' ||
-				user?.role === 'ADMIN') && (
+			{(user?.tipo === UserRoles.FOCAL ||
+				user?.tipo === UserRoles.GERENTE_FROTA ||
+				user?.tipo === UserRoles.PROGRAMADOR) && (
 				<button
 					className='w-fit bg-[rgb(15,219,110)] hover:bg-[hsla(149,87%,40%,1.00)] transition-colors duration-300 text-white px-2 py-3 rounded-xl shadow-lg'
 					onClick={() => navigate('/cadastrar-pedido')}>
@@ -330,8 +331,8 @@ const HomePage = () => {
 									{getSortIcon('client')}
 								</div>
 							</TableCell>
-							{(user?.role === 'GERENTE_FROTA' ||
-								user?.role === 'ADMIN') && (
+							{(user?.tipo === UserRoles.GERENTE_FROTA ||
+								user?.tipo === UserRoles.PROGRAMADOR) && (
 								<TableCell
 									align='center'
 									sx={{
@@ -370,7 +371,7 @@ const HomePage = () => {
 									}}>
 									{order.driver ? (
 										order.driver
-									) : user?.role === 'FOCAL' ? (
+									) : user?.tipo === UserRoles.FOCAL ? (
 										'Não definido'
 									) : (
 										<UserPlus className='mx-auto text-blue-500 hover:text-blue-600 transition-colors duration-300'></UserPlus>
@@ -428,8 +429,8 @@ const HomePage = () => {
 									}}>
 									{order.client}
 								</TableCell>
-								{(user?.role === 'GERENTE_FROTA' ||
-									user?.role === 'ADMIN') && (
+								{(user?.tipo === UserRoles.GERENTE_FROTA ||
+									user?.tipo === UserRoles.PROGRAMADOR) && (
 									<TableCell
 										align='center'
 										sx={{
@@ -438,7 +439,7 @@ const HomePage = () => {
 													? '#ffffff'
 													: '#000000'
 										}}>
-										{user?.role && roleActions[user.role]}
+										{user?.tipo && roleActions[user.tipo]}
 									</TableCell>
 								)}
 							</TableRow>

@@ -2,13 +2,13 @@ import { useState } from 'react'
 import CustomSelect from '../../components/select'
 import { Container, Text } from '../../components/themed'
 import { useTheme } from '../../context/theme'
-import { TiposFrota } from '../../types'
+import { TipoFrota } from '../../utils/types'
 
 const CreateFrotaPage = () => {
 	const { actualTheme } = useTheme()
 
 	const [nome, setNome] = useState<string>('')
-	const [tipo, setTipo] = useState<TiposFrota | null>(null)
+	const [tipo, setTipo] = useState<TipoFrota | null>(null)
 	const [placa, setPlaca] = useState<string>('')
 
 	const handleLimpar = () => {
@@ -27,7 +27,10 @@ const CreateFrotaPage = () => {
 		actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
 	}`
 
-	const handleSubmit = () => {}
+	const handleSubmit = () => {
+		console.log({ nome, tipo, placa })
+		// TODO: Implement frota creation
+	}
 
 	return (
 		<Container>
@@ -77,9 +80,9 @@ const CreateFrotaPage = () => {
 							<CustomSelect
 								id='tipo'
 								defaultValue=''
-								options={TiposFrota}
+								options={TipoFrota}
 								onChange={(value) =>
-									setTipo(value as TiposFrota)
+									setTipo(value as TipoFrota)
 								}
 								placeholder='Selecione o tipo da frota'
 							/>
@@ -96,7 +99,7 @@ const CreateFrotaPage = () => {
 								name='placa'
 								id='placa'
 								value={placa}
-								onChange={() => {}}
+								onChange={(e) => setPlaca(e.target.value)}
 								className={inputClassName}
 								placeholder='Digite a placa do veículo'
 							/>
