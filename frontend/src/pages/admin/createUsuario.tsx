@@ -69,15 +69,19 @@ const CreateUsuarioPage = () => {
 				dataInicio: new Date().toISOString().split('T')[0]
 			}
 
+			console.log('Creating user with role:', selectedRole)
+			console.log('Data:', baseData)
+
+			let response
 			switch (selectedRole) {
 				case UserRoles.ADMIN:
-					await userService.createAdmin(baseData)
+					response = await userService.createAdmin(baseData)
 					break
 				case UserRoles.PROGRAMADOR:
-					await userService.createProgramador(baseData)
+					response = await userService.createProgramador(baseData)
 					break
 				case UserRoles.MOTORISTA:
-					await userService.createMotorista({
+					response = await userService.createMotorista({
 						...baseData,
 						categoria: categHabilitacao!,
 						status: statusMotorista,
@@ -85,27 +89,32 @@ const CreateUsuarioPage = () => {
 					})
 					break
 				case UserRoles.GERENTE_FROTA:
-					await userService.createGerenteFrota(baseData)
+					response = await userService.createGerenteFrota(baseData)
 					break
 				case UserRoles.GERENTE_RISCO:
-					await userService.createGerenteRisco(baseData)
+					response = await userService.createGerenteRisco(baseData)
 					break
 				case UserRoles.FOCAL:
-					await userService.createFocal(baseData)
+					response = await userService.createFocal(baseData)
 					break
 				default:
 					throw new Error('Tipo de usuário inválido')
 			}
 
+			console.log('User created successfully:', response)
+
 			// Success - clear form and navigate
 			handleLimpar()
 			alert('Usuário criado com sucesso!')
-			navigate('/admin/users')
+			navigate('/admin/usuarios')
 		} catch (err: any) {
 			console.error('Error creating user:', err)
+			console.error('Error response:', err.response)
+			console.error('Error data:', err.response?.data)
 			const errorMessage =
 				err.response?.data?.message ||
 				err.response?.data?.errors?.[0] ||
+				err.message ||
 				'Erro ao criar usuário. Tente novamente.'
 			setError(errorMessage)
 		} finally {
@@ -347,61 +356,70 @@ const CreateUsuarioPage = () => {
 							</p>
 						</div>
 					</section>
-				</form>
 
-				{/* Action Buttons */}
-				<div
-					className='flex justify-between items-center mt-8 pt-6 border-t'
-					style={{
-						borderColor: actualTheme === 'dark' ? '#333' : '#e5e5e5'
-					}}>
-					<button
-						type='button'
-						className='px-6 py-2.5 rounded-lg font-medium transition-all duration-200 hover:shadow-md active:scale-95'
+					{/* Action Buttons */}
+					<div
+						className='lg:col-span-3 flex justify-between items-center mt-8 pt-6 border-t'
 						style={{
-							backgroundColor:
-								actualTheme === 'dark' ? '#dc2626' : '#ef4444',
-							color: '#ffffff'
-						}}
-						onMouseEnter={(e) => {
-							e.currentTarget.style.backgroundColor =
-								actualTheme === 'dark' ? '#b91c1c' : '#dc2626'
-						}}
-						onMouseLeave={(e) => {
-							e.currentTarget.style.backgroundColor =
-								actualTheme === 'dark' ? '#dc2626' : '#ef4444'
-						}}
-						onClick={handleLimpar}>
-						Limpar Formulário
-					</button>
-					<button
-						type='submit'
-						disabled={isLoading}
-						className='px-6 py-2.5 rounded-lg font-medium transition-all duration-200 hover:shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed'
-						style={{
-							backgroundColor:
-								actualTheme === 'dark' ? '#16a34a' : '#22c55e',
-							color: '#ffffff'
-						}}
-						onMouseEnter={(e) => {
-							if (!isLoading) {
+							borderColor:
+								actualTheme === 'dark' ? '#333' : '#e5e5e5'
+						}}>
+						<button
+							type='button'
+							className='px-6 py-2.5 rounded-lg font-medium transition-all duration-200 hover:shadow-md active:scale-95'
+							style={{
+								backgroundColor:
+									actualTheme === 'dark'
+										? '#dc2626'
+										: '#ef4444',
+								color: '#ffffff'
+							}}
+							onMouseEnter={(e) => {
 								e.currentTarget.style.backgroundColor =
 									actualTheme === 'dark'
-										? '#15803d'
-										: '#16a34a'
-							}
-						}}
-						onMouseLeave={(e) => {
-							if (!isLoading) {
+										? '#b91c1c'
+										: '#dc2626'
+							}}
+							onMouseLeave={(e) => {
 								e.currentTarget.style.backgroundColor =
+									actualTheme === 'dark'
+										? '#dc2626'
+										: '#ef4444'
+							}}
+							onClick={handleLimpar}>
+							Limpar Formulário
+						</button>
+						<button
+							type='submit'
+							disabled={isLoading}
+							className='px-6 py-2.5 rounded-lg font-medium transition-all duration-200 hover:shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed'
+							style={{
+								backgroundColor:
 									actualTheme === 'dark'
 										? '#16a34a'
-										: '#22c55e'
-							}
-						}}>
-						{isLoading ? 'Cadastrando...' : 'Cadastrar Usuário'}
-					</button>
-				</div>
+										: '#22c55e',
+								color: '#ffffff'
+							}}
+							onMouseEnter={(e) => {
+								if (!isLoading) {
+									e.currentTarget.style.backgroundColor =
+										actualTheme === 'dark'
+											? '#15803d'
+											: '#16a34a'
+								}
+							}}
+							onMouseLeave={(e) => {
+								if (!isLoading) {
+									e.currentTarget.style.backgroundColor =
+										actualTheme === 'dark'
+											? '#16a34a'
+											: '#22c55e'
+								}
+							}}>
+							{isLoading ? 'Cadastrando...' : 'Cadastrar Usuário'}
+						</button>
+					</div>
+				</form>
 			</div>
 		</Container>
 	)

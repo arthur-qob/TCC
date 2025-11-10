@@ -115,6 +115,14 @@ const AppRoutes = () => {
 					</AdminOnly>
 				}
 			/>
+			<Route
+				path='/admin/usuarios'
+				element={
+					<AdminOnly>
+						<UsersPage />
+					</AdminOnly>
+				}
+			/>
 		</Routes>
 	)
 }
@@ -129,13 +137,13 @@ const sidebarRoutesPerRole = {
 	},
 	GERENTE_FROTA: {
 		Dashboard: '/dashboard',
-		Usuários: '/usuarios',
+		Usuários: '/admin/usuarios',
 		'Cadastrar frota': '/admin/cadastrar-frota',
 		'Cadastrar cliente': '/cadastrar-cliente'
 	},
 	ADMIN: {
 		Dashboard: '/dashboard',
-		Usuários: '/usuarios',
+		Usuários: '/admin/usuarios',
 		'Cadastrar Usuário': '/admin/cadastrar-usuario',
 		'Cadastrar cliente': '/cadastrar-cliente',
 		'Cadastrar frota': '/admin/cadastrar-frota'
