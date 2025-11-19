@@ -1,26 +1,12 @@
-import {
-	TableContainer,
-	Table,
-	TableHead,
-	TableRow,
-	TableBody,
-	TableCell,
-	Paper
-} from '@mui/material'
-import {
-	Eye,
-	ChevronsUpDown,
-	ChevronUp,
-	ChevronDown,
-	SquarePen,
-	UserPlus
-} from 'lucide-react'
-import { useState } from 'react'
+import { Eye, SquarePen, UserPlus } from 'lucide-react'
 import { Container, Text } from '../components/themed'
-import { useTheme } from '../context/theme'
-import { useNavigate } from 'react-router-dom'
-import { useUser } from '../context/user'
-import { UserRoles } from '../utils/types'
+import { DataTable, type Column } from '../components/dataTable'
+import { usePermissionNavigate } from '@/utils/routes'
+import { useUser } from '@/context/user'
+import { UserRoles } from '@/utils/types'
+import { capitalizeFirst } from '@/utils/stringFormatters'
+import { useTheme } from '@/context/theme'
+import { ColorHex } from '@/constants/colors'
 
 interface OrderData {
 	id: number
@@ -32,11 +18,11 @@ interface OrderData {
 	client: string
 }
 
-type SortField = keyof Omit<OrderData, 'id'>
-type SortDirection = 'asc' | 'desc' | null
-
 const HomePage = () => {
 	const { user } = useUser()
+	const { actualTheme } = useTheme()
+	const navigate = usePermissionNavigate()
+
 	const ordersData: OrderData[] = [
 		{
 			id: 1,
@@ -93,10 +79,6 @@ const HomePage = () => {
 			client: 'Coca-Cola'
 		}
 	]
-	const { actualTheme } = useTheme()
-	const [sortField, setSortField] = useState<SortField | null>(null)
-	const [sortDirection, setSortDirection] = useState<SortDirection>(null)
-	const navigate = useNavigate()
 
 	const statusColors: Record<string, { bg: string; text: string }> = {
 		Programando: { bg: 'bg-yellow-300', text: 'text-yellow-700' },
@@ -107,86 +89,57 @@ const HomePage = () => {
 		Pendente: { bg: 'bg-orange-300', text: 'text-orange-700' }
 	}
 
-	const handleSort = (field: SortField) => {
-		if (sortField === field) {
-			if (sortDirection === 'asc') {
-				setSortDirection('desc')
-			} else if (sortDirection === 'desc') {
-				setSortDirection(null)
-				setSortField(null)
-			}
-		} else {
-			setSortField(field)
-			setSortDirection('asc')
-		}
-	}
-
-	const getSortIcon = (field: SortField) => {
-		if (sortField !== field) {
-			return (
-				<ChevronsUpDown
-					size={16}
-					className='ml-2 inline'
-				/>
+	const columns: Column<OrderData>[] = [
+		{
+			id: 'driver',
+			label: 'MOTORISTA',
+			render: (value) =>
+				value ? (
+					value
+				) : user?.tipo === UserRoles.FOCAL ? (
+					'Não definido'
+				) : (
+					<UserPlus className='mx-auto text-blue-500 hover:text-blue-600 transition-colors duration-300' />
+				)
+		},
+		{
+			id: 'status',
+			label: 'STATUS',
+			render: (value) => (
+				<p
+					className={`w-fit mx-auto ${
+						statusColors[value]?.bg || 'bg-gray-300'
+					} ${
+						statusColors[value]?.text || 'text-gray-700'
+					} p-2 rounded-full`}>
+					{value}
+				</p>
 			)
+		},
+		{
+			id: 'createdAt',
+			label: 'CRIADO EM'
+		},
+		{
+			id: 'operation',
+			label: 'OPERAÇÃO'
+		},
+		{
+			id: 'cargoType',
+			label: 'TIPO CARGA'
+		},
+		{
+			id: 'client',
+			label: 'CLIENTE'
 		}
-		if (sortDirection === 'asc') {
-			return (
-				<ChevronUp
-					size={16}
-					className='ml-2 inline'
-				/>
-			)
-		}
-		return (
-			<ChevronDown
-				size={16}
-				className='ml-2 inline'
-			/>
-		)
-	}
-
-	const sortedOrders = [...ordersData].sort((a, b) => {
-		if (!sortField || !sortDirection) return 0
-
-		const aValue = a[sortField]
-		const bValue = b[sortField]
-
-		if (aValue === null && bValue === null) return 0
-		if (aValue === null) return sortDirection === 'asc' ? 1 : -1
-		if (bValue === null) return sortDirection === 'asc' ? -1 : 1
-
-		if (sortField === 'createdAt') {
-			const parseDate = (dateStr: string) => {
-				const [day, month, year] = dateStr.split('/')
-				return new Date(Number(year), Number(month) - 1, Number(day))
-			}
-			const aTime = parseDate(aValue as string).getTime()
-			const bTime = parseDate(bValue as string).getTime()
-
-			if (sortDirection === 'asc') {
-				return aTime > bTime ? 1 : -1
-			}
-			return aTime < bTime ? 1 : -1
-		}
-
-		const aString = String(aValue)
-		const bString = String(bValue)
-
-		if (sortDirection === 'asc') {
-			return aString > bString ? 1 : -1
-		}
-		return aString < bString ? 1 : -1
-	})
-
-	const orders = sortedOrders
+	]
 
 	const roleActions: Record<string, React.JSX.Element> = {
 		FOCAL: (
 			<Eye className='mx-auto text-blue-500 hover:text-blue-600 transition-colors duration-300' />
 		),
 		PROGRAMADOR: (
-			<UserPlus className='mx-auto text-blue-500 hover:text-blue-600 transition-colors duration-300'></UserPlus>
+			<UserPlus className='mx-auto text-blue-500 hover:text-blue-600 transition-colors duration-300' />
 		),
 		GERENTE_FROTA: (
 			<SquarePen className='mx-auto text-blue-500 hover:text-blue-600 transition-colors duration-300' />
@@ -196,257 +149,46 @@ const HomePage = () => {
 		)
 	}
 
+	const showActions =
+		user?.tipo === UserRoles.GERENTE_FROTA ||
+		user?.tipo === UserRoles.PROGRAMADOR
+
+	const handleRowClick = (order: OrderData) => {
+		navigate(`/cadastrar-pedido?id=${order.id}`)
+	}
+
 	return (
-		<Container>
-			<Text className='w-fit capitalize text-2xl font-medium'>
-				{user?.tipo || 'No user'}
-			</Text>
-			{(user?.tipo === UserRoles.FOCAL ||
-				user?.tipo === UserRoles.GERENTE_FROTA ||
-				user?.tipo === UserRoles.PROGRAMADOR) && (
-				<button
-					className='w-fit bg-[rgb(15,219,110)] hover:bg-[hsla(149,87%,40%,1.00)] transition-colors duration-300 text-white px-2 py-3 rounded-xl shadow-lg'
-					onClick={() => navigate('/cadastrar-pedido')}>
-					Criar novo pedido
-				</button>
-			)}
-			<TableContainer
-				component={Paper}
-				sx={{
-					backgroundColor:
-						actualTheme === 'dark' ? '#1a1a1a' : '#ffffff',
-					transition: 'background-color 0.2s',
-					borderRadius: '10px',
-					boxShadow:
-						'0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)'
-				}}>
-				<Table>
-					<TableHead>
-						<TableRow
-							sx={{
-								backgroundColor:
-									actualTheme === 'dark'
-										? '#2a2a2a'
-										: '#ffffff'
-							}}>
-							<TableCell
-								align='center'
-								sx={{
-									fontWeight: 'bold',
-									color:
-										actualTheme === 'dark'
-											? '#ffffff'
-											: '#000000',
-									cursor: 'pointer',
-									userSelect: 'none'
-								}}
-								onClick={() => handleSort('driver')}>
-								<div className='flex items-center justify-center'>
-									MOTORISTA
-									{getSortIcon('driver')}
-								</div>
-							</TableCell>
-							<TableCell
-								align='center'
-								sx={{
-									fontWeight: 'bold',
-									color:
-										actualTheme === 'dark'
-											? '#ffffff'
-											: '#000000',
-									cursor: 'pointer',
-									userSelect: 'none'
-								}}
-								onClick={() => handleSort('status')}>
-								<div className='flex items-center justify-center'>
-									STATUS
-									{getSortIcon('status')}
-								</div>
-							</TableCell>
-							<TableCell
-								align='center'
-								sx={{
-									fontWeight: 'bold',
-									color:
-										actualTheme === 'dark'
-											? '#ffffff'
-											: '#000000',
-									cursor: 'pointer',
-									userSelect: 'none'
-								}}
-								onClick={() => handleSort('createdAt')}>
-								<div className='flex items-center justify-center'>
-									CRIADO EM
-									{getSortIcon('createdAt')}
-								</div>
-							</TableCell>
-							<TableCell
-								align='center'
-								sx={{
-									fontWeight: 'bold',
-									color:
-										actualTheme === 'dark'
-											? '#ffffff'
-											: '#000000',
-									cursor: 'pointer',
-									userSelect: 'none'
-								}}
-								onClick={() => handleSort('operation')}>
-								<div className='flex items-center justify-center'>
-									OPERAÇÃO
-									{getSortIcon('operation')}
-								</div>
-							</TableCell>
-							<TableCell
-								align='center'
-								sx={{
-									fontWeight: 'bold',
-									color:
-										actualTheme === 'dark'
-											? '#ffffff'
-											: '#000000',
-									cursor: 'pointer',
-									userSelect: 'none'
-								}}
-								onClick={() => handleSort('cargoType')}>
-								<div className='flex items-center justify-center'>
-									TIPO CARGA
-									{getSortIcon('cargoType')}
-								</div>
-							</TableCell>
-							<TableCell
-								align='center'
-								sx={{
-									fontWeight: 'bold',
-									color:
-										actualTheme === 'dark'
-											? '#ffffff'
-											: '#000000',
-									cursor: 'pointer',
-									userSelect: 'none'
-								}}
-								onClick={() => handleSort('client')}>
-								<div className='flex items-center justify-center'>
-									CLIENTE
-									{getSortIcon('client')}
-								</div>
-							</TableCell>
-							{(user?.tipo === UserRoles.GERENTE_FROTA ||
-								user?.tipo === UserRoles.PROGRAMADOR) && (
-								<TableCell
-									align='center'
-									sx={{
-										fontWeight: 'bold',
-										color:
-											actualTheme === 'dark'
-												? '#ffffff'
-												: '#000000'
-									}}>
-									AÇÕES
-								</TableCell>
-							)}
-						</TableRow>
-					</TableHead>
-					<TableBody>
-						{orders.map((order) => (
-							<TableRow
-								key={order.id}
-								hover
-								sx={{
-									cursor: 'pointer',
-									'&:hover': {
-										backgroundColor:
-											actualTheme === 'dark'
-												? '#2a2a2a'
-												: '#f5f5f5'
-									}
-								}}>
-								<TableCell
-									align='center'
-									sx={{
-										color:
-											actualTheme === 'dark'
-												? '#ffffff'
-												: '#000000'
-									}}>
-									{order.driver ? (
-										order.driver
-									) : user?.tipo === UserRoles.FOCAL ? (
-										'Não definido'
-									) : (
-										<UserPlus className='mx-auto text-blue-500 hover:text-blue-600 transition-colors duration-300'></UserPlus>
-									)}
-								</TableCell>
-								<TableCell align='center'>
-									<p
-										className={`w-fit mx-auto ${
-											statusColors[order.status]?.bg ||
-											'bg-gray-300'
-										} ${
-											statusColors[order.status]?.text ||
-											'text-gray-700'
-										} p-2 rounded-full`}>
-										{order.status}
-									</p>
-								</TableCell>
-								<TableCell
-									align='center'
-									sx={{
-										color:
-											actualTheme === 'dark'
-												? '#ffffff'
-												: '#000000'
-									}}>
-									{order.createdAt}
-								</TableCell>
-								<TableCell
-									align='center'
-									sx={{
-										color:
-											actualTheme === 'dark'
-												? '#ffffff'
-												: '#000000'
-									}}>
-									{order.operation}
-								</TableCell>
-								<TableCell
-									align='center'
-									sx={{
-										color:
-											actualTheme === 'dark'
-												? '#ffffff'
-												: '#000000'
-									}}>
-									{order.cargoType}
-								</TableCell>
-								<TableCell
-									align='center'
-									sx={{
-										color:
-											actualTheme === 'dark'
-												? '#ffffff'
-												: '#000000'
-									}}>
-									{order.client}
-								</TableCell>
-								{(user?.tipo === UserRoles.GERENTE_FROTA ||
-									user?.tipo === UserRoles.PROGRAMADOR) && (
-									<TableCell
-										align='center'
-										sx={{
-											color:
-												actualTheme === 'dark'
-													? '#ffffff'
-													: '#000000'
-										}}>
-										{user?.tipo && roleActions[user.tipo]}
-									</TableCell>
-								)}
-							</TableRow>
-						))}
-					</TableBody>
-				</Table>
-			</TableContainer>
+		<Container
+			animate='fade-up'
+			className={`${
+				actualTheme === 'dark'
+					? `bg-[${ColorHex.zinc[950]}]`
+					: `bg-[${ColorHex.white}]`
+			}`}>
+			<div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 w-full'>
+				<Text className='w-fit capitalize text-2xl font-medium'>
+					{user?.tipo ? capitalizeFirst(user.tipo) : 'No user'}
+				</Text>
+				{(user?.tipo === UserRoles.FOCAL ||
+					user?.tipo === UserRoles.GERENTE_FROTA ||
+					user?.tipo === UserRoles.ADMIN) && (
+					<button
+						className='w-full sm:w-fit bg-[rgb(15,219,110)] hover:bg-[hsla(149,87%,40%,1.00)] transition-colors duration-300 text-white px-3 sm:px-4 py-2 sm:py-3 rounded-xl shadow-lg text-sm sm:text-base'
+						onClick={() => navigate('/cadastrar-pedido')}>
+						Criar novo pedido
+					</button>
+				)}
+			</div>
+			<DataTable
+				columns={columns}
+				data={ordersData}
+				getRowKey={(order) => order.id}
+				showActionsColumn={showActions}
+				renderActions={() =>
+					user?.tipo ? roleActions[user.tipo] : null
+				}
+				onRowClick={handleRowClick}
+			/>
 		</Container>
 	)
 }

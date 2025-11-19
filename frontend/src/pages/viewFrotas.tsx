@@ -2,8 +2,9 @@ import { Container, Text } from '@/components/themed'
 import { ColorHex } from '@/constants/colors'
 import { useTheme } from '@/context/theme'
 
-const CreateRotaPage = () => {
+const FrotasPage = () => {
 	const { actualTheme } = useTheme()
+
 	return (
 		<Container
 			animate='fade-up'
@@ -12,9 +13,11 @@ const CreateRotaPage = () => {
 					? `bg-[${ColorHex.zinc[950]}]`
 					: `bg-[${ColorHex.white}]`
 			}`}>
-			<Text as='h1'>CreateRotaPage</Text>
+			<Text className='w-fit capitalize text-2xl font-medium'>
+				FrotasPage
+			</Text>
 		</Container>
 	)
 }
 
-export default CreateRotaPage
+export default FrotasPage

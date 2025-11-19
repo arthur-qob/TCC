@@ -4,7 +4,10 @@
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
-		"dev": "vite --host",
+		"dev": "cd .. && update-env.bat && cd frontend && vite --host",
+		"dev:localhost": "vite --host",
+		"tunnels:start": "cd .. && start-all-tunnels.bat",
+		"tunnels:config": "cd .. && update-cloudflare-env.bat",
 		"build": "tsc -b && vite build",
 		"lint": "eslint .",
 		"preview": "vite preview"
@@ -26,7 +29,8 @@
 		"lucide-react": "^0.544.0",
 		"react": "^19.1.1",
 		"react-dom": "^19.1.1",
-		"react-router-dom": "^7.9.2"
+		"react-router-dom": "^7.9.2",
+		"react-toastify": "^11.0.5"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.36.0",

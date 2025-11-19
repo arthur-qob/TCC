@@ -29,7 +29,8 @@ CREATE TABLE motoristas (
     data_fim DATE,
     categoria VARCHAR(50),
     status VARCHAR(50),
-    frota_id INTEGER
+    frota_id INTEGER,
+    progresso_mensal DECIMAL(10, 2) DEFAULT 0.00
 );
 
 -- GerenteFrota table (Fleet Manager role)

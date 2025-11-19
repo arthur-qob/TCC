@@ -3,6 +3,7 @@ import CustomSelect from '../../components/select'
 import { Container, Text } from '../../components/themed'
 import { useTheme } from '../../context/theme'
 import { TipoFrota } from '../../utils/types'
+import { ColorHex, getColor } from '@/constants/colors'
 
 const CreateFrotaPage = () => {
 	const { actualTheme } = useTheme()
@@ -17,15 +18,26 @@ const CreateFrotaPage = () => {
 		setPlaca('')
 	}
 
-	const inputClassName = `w-full rounded-lg border px-3 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 ${
-		actualTheme === 'dark'
-			? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
-			: 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-	}`
+	const isDark = actualTheme === 'dark'
 
-	const labelClassName = `text-sm font-medium mb-1 block ${
-		actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-	}`
+	const inputClassName = `w-full rounded-lg border px-3 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-${getColor(
+		'focus',
+		isDark ? 'dark' : 'light'
+	)} bg-${getColor(
+		'input.background',
+		isDark ? 'dark' : 'light'
+	)} border-${getColor(
+		'input.border',
+		isDark ? 'dark' : 'light'
+	)} text-${getColor(
+		'text.primary',
+		isDark ? 'dark' : 'light'
+	)} placeholder-${getColor('input.placeholder', isDark ? 'dark' : 'light')}`
+
+	const labelClassName = `text-sm font-medium mb-1 block text-${getColor(
+		'text.secondary',
+		isDark ? 'dark' : 'light'
+	)}`
 
 	const handleSubmit = () => {
 		console.log({ nome, tipo, placa })
@@ -33,7 +45,13 @@ const CreateFrotaPage = () => {
 	}
 
 	return (
-		<Container>
+		<Container
+			animate='fade-up'
+			className={`${
+				actualTheme === 'dark'
+					? `bg-[${ColorHex.zinc[950]}]`
+					: `bg-[${ColorHex.white}]`
+			}`}>
 			<Text
 				as='h1'
 				className='font-normal'>
@@ -41,18 +59,19 @@ const CreateFrotaPage = () => {
 			</Text>
 
 			<form
-				className='rounded-xl shadow-lg p-8'
+				className='rounded-xl shadow-lg p-4 sm:p-6 md:p-8'
 				style={{
-					backgroundColor:
-						actualTheme === 'dark' ? '#1a1a1a' : '#ffffff',
+					backgroundColor: isDark
+						? ColorHex.zinc[900]
+						: ColorHex.white,
 					border: `1px solid ${
-						actualTheme === 'dark' ? '#333' : '#e5e5e5'
+						isDark ? ColorHex.zinc[700] : ColorHex.zinc[300]
 					}`
 				}}>
 				<form
 					onSubmit={handleSubmit}
-					className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
-					<section className='lg:col-span-2 space-y-5'>
+					className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8'>
+					<section className='md:col-span-2 lg:col-span-2 space-y-4 sm:space-y-5'>
 						<div className='space-y-2'>
 							<label
 								htmlFor='nome'
@@ -114,12 +133,12 @@ const CreateFrotaPage = () => {
 					</section>
 
 					{/* Profile Picture Section */}
-					<section className='flex flex-col items-center justify-start'>
+					<section className='flex flex-col items-center justify-start md:col-span-2 lg:col-span-1'>
 						<label className={`${labelClassName} text-center mb-3`}>
 							Foto de Perfil
 						</label>
 						<div
-							className='rounded-xl w-full max-w-[250px] h-[250px] flex flex-col items-center justify-center text-center border-2 border-dashed transition-colors hover:border-blue-500 cursor-pointer'
+							className='rounded-xl w-full max-w-[200px] sm:max-w-[250px] h-[200px] sm:h-[250px] flex flex-col items-center justify-center text-center border-2 border-dashed transition-colors hover:border-blue-500 cursor-pointer'
 							style={{
 								backgroundColor:
 									actualTheme === 'dark'
@@ -153,44 +172,52 @@ const CreateFrotaPage = () => {
 
 				{/* Action Buttons */}
 				<div
-					className='flex justify-between items-center mt-8 pt-6 border-t'
+					className='flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-0 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t'
 					style={{
-						borderColor: actualTheme === 'dark' ? '#333' : '#e5e5e5'
+						borderColor: isDark
+							? ColorHex.zinc[700]
+							: ColorHex.zinc[300]
 					}}>
 					<button
 						type='button'
-						className='px-6 py-2.5 rounded-lg font-medium transition-all duration-200 hover:shadow-md active:scale-95'
+						className='px-4 sm:px-6 py-2.5 rounded-lg font-medium text-sm sm:text-base transition-all duration-200 hover:shadow-md active:scale-95'
 						style={{
-							backgroundColor:
-								actualTheme === 'dark' ? '#dc2626' : '#ef4444',
-							color: '#ffffff'
+							backgroundColor: isDark
+								? ColorHex.red[600]
+								: ColorHex.red[500],
+							color: ColorHex.white
 						}}
 						onMouseEnter={(e) => {
-							e.currentTarget.style.backgroundColor =
-								actualTheme === 'dark' ? '#b91c1c' : '#dc2626'
+							e.currentTarget.style.backgroundColor = isDark
+								? ColorHex.red[700]
+								: ColorHex.red[600]
 						}}
 						onMouseLeave={(e) => {
-							e.currentTarget.style.backgroundColor =
-								actualTheme === 'dark' ? '#dc2626' : '#ef4444'
+							e.currentTarget.style.backgroundColor = isDark
+								? ColorHex.red[600]
+								: ColorHex.red[500]
 						}}
 						onClick={handleLimpar}>
 						Limpar Formulário
 					</button>
 					<button
 						type='submit'
-						className='px-6 py-2.5 rounded-lg font-medium transition-all duration-200 hover:shadow-md active:scale-95'
+						className='px-4 sm:px-6 py-2.5 rounded-lg font-medium text-sm sm:text-base transition-all duration-200 hover:shadow-md active:scale-95'
 						style={{
-							backgroundColor:
-								actualTheme === 'dark' ? '#16a34a' : '#22c55e',
-							color: '#ffffff'
+							backgroundColor: isDark
+								? ColorHex.green[600]
+								: ColorHex.green[500],
+							color: ColorHex.white
 						}}
 						onMouseEnter={(e) => {
-							e.currentTarget.style.backgroundColor =
-								actualTheme === 'dark' ? '#15803d' : '#16a34a'
+							e.currentTarget.style.backgroundColor = isDark
+								? ColorHex.green[700]
+								: ColorHex.green[600]
 						}}
 						onMouseLeave={(e) => {
-							e.currentTarget.style.backgroundColor =
-								actualTheme === 'dark' ? '#16a34a' : '#22c55e'
+							e.currentTarget.style.backgroundColor = isDark
+								? ColorHex.green[600]
+								: ColorHex.green[500]
 						}}>
 						Cadastrar Frota
 					</button>

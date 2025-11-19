@@ -1,5 +1,6 @@
 package com.backend.model;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -38,6 +39,9 @@ public class Motorista extends Papel {
 	@OneToOne
 	@JoinColumn(name = "frota_id")
 	private Frota frota;
+
+	@Column(name = "progresso_mensal", nullable = false, precision = 10, scale = 2)
+	private BigDecimal progressoMensal = BigDecimal.ZERO;
 
 	@OneToMany(mappedBy = "motorista")
 	private Set<Pedido> pedidosTransportados = new HashSet<>();

@@ -18,6 +18,7 @@ public class MotoristaMapper {
 		m.setDataFim(dto.getDataFim());
 		m.setCategoria(dto.getCategoria());
 		m.setStatus(dto.getStatus());
+		m.setProgressoMensal(dto.getProgressoMensal() != null ? dto.getProgressoMensal() : java.math.BigDecimal.ZERO);
 
 		if (dto.getFrotaId() != null) {
 			Frota frota = new Frota();
@@ -37,6 +38,7 @@ public class MotoristaMapper {
 		dto.setDataFim(m.getDataFim());
 		dto.setCategoria(m.getCategoria());
 		dto.setStatus(m.getStatus());
+		dto.setProgressoMensal(m.getProgressoMensal());
 
 		if (m.getFrota() != null) {
 			dto.setFrotaId(m.getFrota().getId());

@@ -21,6 +21,12 @@ export const userService = {
 		return response.data
 	},
 
+	// List all clients
+	getAllClients: async () => {
+		const response = await api.get('/clientes')
+		return response.data
+	},
+
 	// Delete user
 	deleteUser: async (userId: number) => {
 		const response = await api.delete(`/users/${userId}`)

@@ -2,6 +2,7 @@ package com.backend.config;
 
 import java.util.Arrays;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,6 +24,9 @@ import com.backend.service.CustomUserDetailsService;
 public class SecurityConfig {
 
 	private final CustomUserDetailsService userDetailsService;
+
+	@Value("${frontend.url}")
+	private String frontendUrl;
 
 	public SecurityConfig(CustomUserDetailsService userDetailsService) {
 		this.userDetailsService = userDetailsService;
@@ -66,9 +70,19 @@ public class SecurityConfig {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:3000"));
+		// Allow frontend URL from environment variable and fallback patterns
+		configuration.setAllowedOriginPatterns(Arrays.asList(
+				frontendUrl,
+				"http://localhost:*",
+				"http://127.0.0.1:*",
+				"http://192.168.*.*:*",
+				"http://10.*.*.*:*",
+				"http://172.*.*.*:*",
+				"https://*.trycloudflare.com",  // Cloudflare Tunnel domains
+				"https://*.cloudflare.com",
+				"https://*"));  // Allow any HTTPS origin (adjust this based on your needs)
 
-		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
 		configuration.setAllowedHeaders(Arrays.asList("*"));
 		configuration.setAllowCredentials(true);
 

@@ -16,11 +16,12 @@ export type AuthResponse = Usuario
 
 export interface AuthContextType {
 	user: Usuario | null
-	signin: (credentials: LoginRequest) => Promise<void>
-	signup: (data: SignupRequest) => Promise<void>
+	signin: (credentials: LoginRequest) => Promise<Usuario>
+	signup: (data: SignupRequest) => Promise<Usuario>
 	logout: () => Promise<void>
-	refreshUser: () => Promise<void>
+	refreshUser: () => Promise<Usuario>
 	getUserRole: () => UserRole | null
 	hasRole: (role: UserRole) => boolean
 	isAuthenticated: boolean
+	isCheckingSession: boolean
 }

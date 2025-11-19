@@ -1,30 +1,29 @@
-import { type ReactNode } from 'react'
-import { useTheme } from '../../context/theme'
+import { useEffect, useRef, type ReactNode } from 'react'
 
 interface ContainerProps {
 	children: ReactNode
-	classNameContainer?: string
-	classNameInnerSection?: string
+	className?: string
+	animate?: string
 }
 
-const Container = ({
-	children,
-	classNameContainer = '',
-	classNameInnerSection = ''
-}: ContainerProps) => {
-	const { actualTheme } = useTheme()
+const Container = ({ children, className = '', animate }: ContainerProps) => {
+	const hasAnimated = useRef(false)
 
-	const baseStylesContainer = 'flex flex-col items-end min-h-screen gap-4'
+	useEffect(() => {
+		hasAnimated.current = true
+	}, [])
+
+	const baseStylesContainer =
+		'flex flex-col items-end min-h-[75%] gap-4 z-25 scroll-smooth'
 	const baseStylesInnerSection =
-		'w-[95%] px-5 py-8 flex flex-col gap-10 transition-colors duration-200'
-	const themeStyles = actualTheme === 'dark' ? 'bg-black' : 'bg-gray-100'
+		'w-full sm:w-[98%] md:w-[96%] lg:w-[95%] px-3 sm:px-5 md:px-6 py-8 mt-[55px] flex flex-col gap-6 sm:gap-8 md:gap-10 transition-colors duration-200'
 
 	return (
 		<div
-			className={`${baseStylesContainer} ${themeStyles} ${classNameContainer}`}>
-			<section
-				className={`${baseStylesInnerSection} ${classNameInnerSection}`}
-				data-aos='fade-up'>
+			className={`${baseStylesContainer}`}
+			data-aos={animate}
+			data-aos-once='true'>
+			<section className={`${baseStylesInnerSection} ${className}`}>
 				{children}
 			</section>
 		</div>

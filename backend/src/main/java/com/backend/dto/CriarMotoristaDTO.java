@@ -1,5 +1,6 @@
 package com.backend.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import com.backend.model.enums.CategoriasMotorista;
@@ -38,4 +39,5 @@ public class CriarMotoristaDTO {
 	private StatusMotorista status;
 
 	private Integer frotaId;
+	private BigDecimal progressoMensal;
 }

@@ -24,18 +24,18 @@ const Text = ({
 				case 'primary':
 					return 'text-white'
 				case 'secondary':
-					return 'text-gray-300'
+					return 'text-zinc-300'
 				case 'muted':
-					return 'text-gray-500'
+					return 'text-zinc-500'
 			}
 		} else {
 			switch (variant) {
 				case 'primary':
-					return 'text-gray-900'
+					return 'text-zinc-900'
 				case 'secondary':
-					return 'text-gray-700'
+					return 'text-zinc-700'
 				case 'muted':
-					return 'text-gray-500'
+					return 'text-zinc-500'
 			}
 		}
 	}
@@ -43,17 +43,17 @@ const Text = ({
 	const getElementStyles = () => {
 		switch (Component) {
 			case 'h1':
-				return 'text-4xl font-bold'
+				return 'text-2xl sm:text-3xl md:text-4xl font-bold'
 			case 'h2':
-				return 'text-3xl font-bold'
+				return 'text-xl sm:text-2xl md:text-3xl font-bold'
 			case 'h3':
-				return 'text-2xl font-semibold'
+				return 'text-lg sm:text-xl md:text-2xl font-semibold'
 			case 'h4':
-				return 'text-xl font-semibold'
+				return 'text-base sm:text-lg md:text-xl font-semibold'
 			case 'h5':
-				return 'text-lg font-medium'
+				return 'text-sm sm:text-base md:text-lg font-medium'
 			case 'h6':
-				return 'text-base font-medium'
+				return 'text-xs sm:text-sm md:text-base font-medium'
 			case 'p':
 			case 'span':
 			default:

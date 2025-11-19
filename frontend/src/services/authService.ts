@@ -4,7 +4,9 @@ import { api } from '../utils/api'
 
 export const authService = {
 	async signin(credentials: LoginRequest): Promise<Usuario> {
+		console.log('authService.signin called, making API request...')
 		const response = await api.post<Usuario>('/auth/signin', credentials)
+		console.log('authService.signin API response:', response.data)
 		return response.data
 	},
 

@@ -2,7 +2,7 @@ import { Eye, EyeOff, Lock, Mail } from 'lucide-react'
 import { useState } from 'react'
 import Spinner from '../components/spinner'
 import { useUser } from '../context/user'
-import { useNavigate } from 'react-router-dom'
+import { usePermissionNavigate } from '@/utils/routes'
 
 const SignInPage = () => {
 	const [email, setEmail] = useState<string>('')
@@ -17,7 +17,7 @@ const SignInPage = () => {
 	const [loading, setLoading] = useState(false)
 
 	const { signin } = useUser()
-	const navigate = useNavigate()
+	const navigate = usePermissionNavigate()
 
 	const togglePasswordVisibility = () => {
 		setShowPassword((prev) => !prev)
@@ -25,7 +25,14 @@ const SignInPage = () => {
 
 	const handleFormSubmition = (e: React.FormEvent) => {
 		e.preventDefault() // Prevent default form submission
-		setLoading(true)
+
+		console.log('handleFormSubmition called, loading state:', loading)
+
+		// Prevent double submission
+		if (loading) {
+			console.log('Already loading, returning early')
+			return
+		}
 
 		const newErrors: typeof errors = {
 			email: null,
@@ -41,36 +48,55 @@ const SignInPage = () => {
 			newErrors.password = 'Password is required'
 		}
 
-		setErrors(newErrors)
+		if (Object.values(newErrors).some((error) => error !== null)) {
+			console.log('Validation errors found:', newErrors)
+			setErrors(newErrors)
+			return
+		}
 
-		if (Object.values(newErrors).some((error) => error !== null)) return
+		console.log('Starting signin process...')
+		setLoading(true)
+		setErrors({ email: null, password: null, general: null })
 
 		signin({ email, password })
-			.then(() => navigate('/dashboard'))
+			.then((user) => {
+				console.log('Signin successful, navigating...')
+				navigate('/dashboard', user)
+			})
 			.catch((e) => {
-				newErrors.general = e.message || 'Invalid email or password'
+				console.log('Signin failed:', e)
+				setErrors({
+					email: null,
+					password: null,
+					general: e.message || 'Invalid email or password'
+				})
 			})
 			.finally(() => {
-				setErrors(newErrors)
+				console.log('Signin process complete, setting loading to false')
 				setLoading(false)
 			})
 	}
 
 	return (
 		<section
-			className='flex flex-col items-center min-h-screen bg-cover bg-center bg-no-repeat p-4 overflow-y-hidden'
-			style={{ backgroundImage: 'url(/bg_login.png)' }}>
+			className='flex flex-col items-center min-h-[100dvh] bg-cover bg-center bg-no-repeat p-2 sm:p-4 overflow-y-hidden'
+			// style={{ backgroundImage: 'url(/bg_login.png)' }}
+		>
+			<img
+				src='/bg_login.png'
+				alt='Background'
+				className='absolute inset-0 w-full h-full object-cover'
+			/>
 			<div className='absolute inset-0 flex-1 bg-[rgba(0,0,0,0.75)] flex flex-col justify-center items-center'>
 				<form
-					className='w-full max-w-[500px] px-6 sm:px-12 md:px-20 py-8 md:py-10 rounded-xl bg-[rgba(150,150,150,0.25)] backdrop-blur-[10px] shadow-lg text-white'
+					className='w-[95%] sm:w-[90%] md:w-[85%] lg:max-w-[500px] px-4 sm:px-8 md:px-12 lg:px-20 py-6 sm:py-8 md:py-10 rounded-xl bg-[rgba(150,150,150,0.25)] backdrop-blur-[10px] shadow-lg text-white'
 					onSubmit={handleFormSubmition}>
 					<img
 						src='/logo_ziranlog.png'
 						alt='Logo da empresa ZiranLog'
-						width={'250'}
-						className='mx-auto mb-10'
+						className='mx-auto mb-6 sm:mb-8 md:mb-10 w-[180px] sm:w-[220px] md:w-[250px]'
 					/>
-					<h1 className='font-poppins text-2xl sm:text-3xl text-medium mx-auto mb-10 text-center'>
+					<h1 className='font-poppins text-xl sm:text-2xl md:text-3xl text-medium mx-auto mb-6 sm:mb-8 md:mb-10 text-center'>
 						Login
 					</h1>
 					<div className='flex flex-col gap-2'>
@@ -155,7 +181,8 @@ const SignInPage = () => {
 					</p>
 					<button
 						type='submit'
-						className='w-full flex items-center justify-center border border-[rgb(213,16,31)] bg-[rgb(213,16,31)] text-white px-4 py-2 rounded-lg hover:bg-[hsl(355,86%,35%)] hover:border-[hsl(355,86%,35%)] transition-colors my-4 font-medium text-lg'>
+						disabled={loading}
+						className='w-full flex items-center justify-center border border-[rgb(213,16,31)] bg-[rgb(213,16,31)] text-white px-4 py-2 sm:py-2.5 rounded-lg hover:bg-[hsl(355,86%,35%)] hover:border-[hsl(355,86%,35%)] transition-colors my-4 font-medium text-base sm:text-lg disabled:opacity-50 disabled:cursor-not-allowed'>
 						{loading ? <Spinner /> : 'Login'}
 					</button>
 					{errors?.general !== null && (

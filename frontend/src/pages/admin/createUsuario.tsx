@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { usePermissionNavigate } from '@/utils/routes'
 import CustomSelect from '../../components/select'
 import { Container, Text } from '../../components/themed'
 import { useTheme } from '../../context/theme'
@@ -10,10 +10,11 @@ import {
 	UserRoles
 } from '../../utils/types'
 import { userService } from '../../services/userService'
+import { ColorHex } from '@/constants/colors'
 
 const CreateUsuarioPage = () => {
 	const { actualTheme } = useTheme()
-	const navigate = useNavigate()
+	const navigate = usePermissionNavigate()
 
 	const [nome, setNome] = useState<string>('')
 	const [email, setEmail] = useState<string>('')
@@ -122,18 +123,25 @@ const CreateUsuarioPage = () => {
 		}
 	}
 
-	const inputClassName = `w-full rounded-lg border px-3 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 ${
-		actualTheme === 'dark'
-			? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
-			: 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-	}`
+	const isDark = actualTheme === 'dark'
 
-	const labelClassName = `text-sm font-medium mb-1 block ${
-		actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-	}`
+	const inputStyle = {
+		backgroundColor: isDark ? ColorHex.zinc[800] : ColorHex.white,
+		borderColor: isDark ? ColorHex.zinc[700] : ColorHex.zinc[300],
+		color: isDark ? ColorHex.zinc[100] : ColorHex.zinc[900]
+	}
+
+	const inputClassName =
+		'w-full rounded-lg border px-3 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500'
+
+	const labelStyle = {
+		color: isDark ? ColorHex.zinc[400] : ColorHex.zinc[700]
+	}
+
+	const labelClassName = 'text-sm font-medium mb-1 block'
 
 	return (
-		<Container>
+		<Container animate='fade-up'>
 			<Text
 				as='h1'
 				className='font-normal'>
@@ -141,30 +149,32 @@ const CreateUsuarioPage = () => {
 			</Text>
 
 			<div
-				className='rounded-xl shadow-lg p-8'
+				className='rounded-xl shadow-lg p-4 sm:p-6 md:p-8'
 				style={{
-					backgroundColor:
-						actualTheme === 'dark' ? '#1a1a1a' : '#ffffff',
+					backgroundColor: isDark
+						? ColorHex.zinc[900]
+						: ColorHex.white,
 					border: `1px solid ${
-						actualTheme === 'dark' ? '#333' : '#e5e5e5'
+						isDark ? ColorHex.zinc[700] : ColorHex.zinc[300]
 					}`
 				}}>
 				<form
 					onSubmit={handleSubmit}
-					className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
+					className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8'>
 					{error && (
-						<div className='lg:col-span-3 p-4 rounded-lg bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700'>
+						<div className='md:col-span-2 lg:col-span-3 p-4 rounded-lg bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700'>
 							<p className='text-red-700 dark:text-red-300 text-sm'>
 								{error}
 							</p>
 						</div>
 					)}
 
-					<section className='lg:col-span-2 space-y-5'>
+					<section className='md:col-span-2 lg:col-span-2 space-y-4 sm:space-y-5'>
 						<div className='space-y-2'>
 							<label
 								htmlFor='nome'
-								className={labelClassName}>
+								className={labelClassName}
+								style={labelStyle}>
 								Nome Completo{' '}
 								<span className='text-red-500'>*</span>
 							</label>
@@ -175,6 +185,7 @@ const CreateUsuarioPage = () => {
 								value={nome}
 								onChange={(e) => setNome(e.target.value)}
 								className={inputClassName}
+								style={inputStyle}
 								placeholder='Digite o nome completo'
 								required
 							/>
@@ -183,7 +194,8 @@ const CreateUsuarioPage = () => {
 						<div className='space-y-2'>
 							<label
 								htmlFor='email'
-								className={labelClassName}>
+								className={labelClassName}
+								style={labelStyle}>
 								Email <span className='text-red-500'>*</span>
 							</label>
 							<input
@@ -193,6 +205,7 @@ const CreateUsuarioPage = () => {
 								value={email}
 								onChange={(e) => setEmail(e.target.value)}
 								className={inputClassName}
+								style={inputStyle}
 								placeholder='usuario@exemplo.com'
 								required
 							/>
@@ -201,7 +214,8 @@ const CreateUsuarioPage = () => {
 						<div className='space-y-2'>
 							<label
 								htmlFor='password'
-								className={labelClassName}>
+								className={labelClassName}
+								style={labelStyle}>
 								Senha <span className='text-red-500'>*</span>
 							</label>
 							<input
@@ -211,6 +225,7 @@ const CreateUsuarioPage = () => {
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
 								className={inputClassName}
+								style={inputStyle}
 								placeholder='Mínimo 6 caracteres'
 								minLength={6}
 								required
@@ -220,7 +235,8 @@ const CreateUsuarioPage = () => {
 						<div className='space-y-2'>
 							<label
 								htmlFor='role'
-								className={labelClassName}>
+								className={labelClassName}
+								style={labelStyle}>
 								Papel do Usuário{' '}
 								<span className='text-red-500'>*</span>
 							</label>
@@ -245,24 +261,25 @@ const CreateUsuarioPage = () => {
 							<div
 								className='space-y-5 pt-4 border-t'
 								style={{
-									borderColor:
-										actualTheme === 'dark'
-											? '#333'
-											: '#e5e5e5'
+									borderColor: isDark
+										? ColorHex.zinc[700]
+										: ColorHex.zinc[300]
 								}}>
 								<h3
-									className={`text-lg font-medium ${
-										actualTheme === 'dark'
-											? 'text-gray-200'
-											: 'text-gray-800'
-									}`}>
+									className='text-lg font-medium'
+									style={{
+										color: isDark
+											? ColorHex.zinc[200]
+											: ColorHex.zinc[800]
+									}}>
 									Informações do Motorista
 								</h3>
 
 								<div className='space-y-2'>
 									<label
 										htmlFor='frota'
-										className={labelClassName}>
+										className={labelClassName}
+										style={labelStyle}>
 										Frota ID
 									</label>
 									<input
@@ -273,6 +290,7 @@ const CreateUsuarioPage = () => {
 											setFrotaId(e.target.value)
 										}
 										className={inputClassName}
+										style={inputStyle}
 										placeholder='ID da frota (opcional)'
 									/>
 								</div>
@@ -280,7 +298,8 @@ const CreateUsuarioPage = () => {
 								<div className='space-y-2'>
 									<label
 										htmlFor='status'
-										className={labelClassName}>
+										className={labelClassName}
+										style={labelStyle}>
 										Status{' '}
 										<span className='text-red-500'>*</span>
 									</label>
@@ -300,7 +319,8 @@ const CreateUsuarioPage = () => {
 								<div className='space-y-2'>
 									<label
 										htmlFor='habilitacao'
-										className={labelClassName}>
+										className={labelClassName}
+										style={labelStyle}>
 										Categoria de Habilitação{' '}
 										<span className='text-red-500'>*</span>
 									</label>
@@ -321,23 +341,24 @@ const CreateUsuarioPage = () => {
 					</section>
 
 					{/* Profile Picture Section */}
-					<section className='flex flex-col items-center justify-start'>
-						<label className={`${labelClassName} text-center mb-3`}>
+					<section className='flex flex-col items-center justify-start md:col-span-2 lg:col-span-1'>
+						<label
+							className={`${labelClassName} text-center mb-3`}
+							style={labelStyle}>
 							Foto de Perfil
 						</label>
 						<div
-							className='rounded-xl w-full max-w-[250px] h-[250px] flex flex-col items-center justify-center text-center border-2 border-dashed transition-colors hover:border-blue-500 cursor-pointer'
+							className='rounded-xl w-full max-w-[200px] sm:max-w-[250px] h-[200px] sm:h-[250px] flex flex-col items-center justify-center text-center border-2 border-dashed transition-colors hover:border-blue-500 cursor-pointer'
 							style={{
-								backgroundColor:
-									actualTheme === 'dark'
-										? '#2a2a2a'
-										: '#f3f4f6',
-								borderColor:
-									actualTheme === 'dark' ? '#444' : '#d1d5db',
-								color:
-									actualTheme === 'dark'
-										? '#9ca3af'
-										: '#6b7280'
+								backgroundColor: isDark
+									? ColorHex.zinc[800]
+									: ColorHex.zinc[100],
+								borderColor: isDark
+									? ColorHex.zinc[700]
+									: ColorHex.zinc[300],
+								color: isDark
+									? ColorHex.zinc[400]
+									: ColorHex.zinc[600]
 							}}>
 							<svg
 								className='w-16 h-16 mb-3'
@@ -359,32 +380,30 @@ const CreateUsuarioPage = () => {
 
 					{/* Action Buttons */}
 					<div
-						className='lg:col-span-3 flex justify-between items-center mt-8 pt-6 border-t'
+						className='md:col-span-2 lg:col-span-3 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-0 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t'
 						style={{
-							borderColor:
-								actualTheme === 'dark' ? '#333' : '#e5e5e5'
+							borderColor: isDark
+								? ColorHex.zinc[700]
+								: ColorHex.zinc[300]
 						}}>
 						<button
 							type='button'
-							className='px-6 py-2.5 rounded-lg font-medium transition-all duration-200 hover:shadow-md active:scale-95'
+							className='px-4 sm:px-6 py-2.5 rounded-lg font-medium text-sm sm:text-base transition-all duration-200 hover:shadow-md active:scale-95'
 							style={{
-								backgroundColor:
-									actualTheme === 'dark'
-										? '#dc2626'
-										: '#ef4444',
-								color: '#ffffff'
+								backgroundColor: isDark
+									? ColorHex.red[600]
+									: ColorHex.red[500],
+								color: ColorHex.white
 							}}
 							onMouseEnter={(e) => {
-								e.currentTarget.style.backgroundColor =
-									actualTheme === 'dark'
-										? '#b91c1c'
-										: '#dc2626'
+								e.currentTarget.style.backgroundColor = isDark
+									? ColorHex.red[700]
+									: ColorHex.red[600]
 							}}
 							onMouseLeave={(e) => {
-								e.currentTarget.style.backgroundColor =
-									actualTheme === 'dark'
-										? '#dc2626'
-										: '#ef4444'
+								e.currentTarget.style.backgroundColor = isDark
+									? ColorHex.red[600]
+									: ColorHex.red[500]
 							}}
 							onClick={handleLimpar}>
 							Limpar Formulário
@@ -392,28 +411,27 @@ const CreateUsuarioPage = () => {
 						<button
 							type='submit'
 							disabled={isLoading}
-							className='px-6 py-2.5 rounded-lg font-medium transition-all duration-200 hover:shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed'
+							className='px-4 sm:px-6 py-2.5 rounded-lg font-medium text-sm sm:text-base transition-all duration-200 hover:shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed'
 							style={{
-								backgroundColor:
-									actualTheme === 'dark'
-										? '#16a34a'
-										: '#22c55e',
-								color: '#ffffff'
+								backgroundColor: isDark
+									? ColorHex.green[600]
+									: ColorHex.green[500],
+								color: ColorHex.white
 							}}
 							onMouseEnter={(e) => {
 								if (!isLoading) {
 									e.currentTarget.style.backgroundColor =
-										actualTheme === 'dark'
-											? '#15803d'
-											: '#16a34a'
+										isDark
+											? ColorHex.green[700]
+											: ColorHex.green[600]
 								}
 							}}
 							onMouseLeave={(e) => {
 								if (!isLoading) {
 									e.currentTarget.style.backgroundColor =
-										actualTheme === 'dark'
-											? '#16a34a'
-											: '#22c55e'
+										isDark
+											? ColorHex.green[600]
+											: ColorHex.green[500]
 								}
 							}}>
 							{isLoading ? 'Cadastrando...' : 'Cadastrar Usuário'}

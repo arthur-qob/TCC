@@ -1,14 +1,20 @@
-import { Route, Routes, Navigate } from 'react-router-dom'
+import {
+	Route,
+	Routes,
+	Navigate,
+	useNavigate,
+	useLocation
+} from 'react-router-dom'
 import SignIn from '../pages/signin'
 import HomePage from '../pages/index'
 import CreatePedidoPage from '../pages/createPedido'
 import CreateUsuarioPage from '../pages/admin/createUsuario'
-import UsersPage from '../pages/admin/users'
+import UsersPage from '../pages/admin/viewUsuarios'
 import CreateClientePage from '../pages/createCliente'
 import CreateFrotaPage from '../pages/admin/createFrota'
 
 import { useUser } from '../context/user'
-import { UserRoles } from '../utils/types'
+import { UserRoles, type UserRole, type Usuario } from '../utils/types'
 
 interface ProtectedRouteProps {
 	children: React.ReactNode
@@ -55,6 +61,53 @@ const AdminOnly = ({ children }: AdminOnlyProps) => {
 	)
 }
 
+import { RoutesPerRole } from '@/utils/rolesRoutes'
+import toast from '@/components/toast'
+import ClientesPage from '@/pages/viewClientes'
+import FrotasPage from '@/pages/viewFrotas'
+import RotasPage from '@/pages/viewRotas'
+
+const checkRoutePermissions = (userType: UserRole, route: string) => {
+	const allowedRoutes = Object.values(
+		RoutesPerRole[userType as keyof typeof RoutesPerRole] || {}
+	)
+
+	if (route === '/signin') {
+		return true
+	} else {
+		return allowedRoutes.includes(route)
+	}
+}
+
+const usePermissionNavigate = () => {
+	const nav = useNavigate()
+	const location = useLocation()
+	const currentPath = location.pathname
+	const { user } = useUser()
+
+	const navigate = (route: string, user2?: Usuario) => {
+		const userTipo = user ? user.tipo : user2?.tipo
+
+		if (userTipo) {
+			checkRoutePermissions(userTipo, route)
+				? nav(route)
+				: toast.emitToast({
+						type: 'error',
+						message:
+							'Você não tem permissão para acessar esta rota.'
+				  })
+		} else {
+			console.log(
+				'User type undefined, navigating to current path:',
+				currentPath
+			)
+			nav(currentPath)
+		}
+	}
+
+	return navigate
+}
+
 const AppRoutes = () => {
 	return (
 		<Routes>
@@ -88,6 +141,38 @@ const AppRoutes = () => {
 				}
 			/>
 			<Route
+				path='/clientes'
+				element={
+					<ProtectedRoute>
+						<ClientesPage />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path='/clientes/cadastrar-cliente'
+				element={
+					<AdminOnly>
+						<CreateClientePage />
+					</AdminOnly>
+				}
+			/>
+			<Route
+				path='/frotas'
+				element={
+					<ProtectedRoute>
+						<FrotasPage />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path='/Rotas'
+				element={
+					<ProtectedRoute>
+						<RotasPage />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
 				path='/cadastrar-pedido'
 				element={
 					<ProtectedRoute>
@@ -104,7 +189,11 @@ const AppRoutes = () => {
 				}
 			/>
 			<Route
-				path='/cadastrar-cliente'
+				path='/pedidos/novo'
+				element={<CreateClientePage />}
+			/>
+			<Route
+				path='/pedidos/editar/:id'
 				element={<CreateClientePage />}
 			/>
 			<Route
@@ -130,25 +219,27 @@ const AppRoutes = () => {
 const sidebarRoutesPerRole = {
 	FOCAL: {
 		Dashboard: '/dashboard',
-		'Cadastrar cliente': '/cadastrar-cliente'
+		Clientes: '/clientes',
+		Frotas: '/admin/frotas'
 	},
 	PROGRAMADOR: {
-		Dashboard: '/dashboard'
+		Dashboard: '/dashboard',
+		Clientes: '/clientes',
+		Frotas: '/admin/frotas'
 	},
 	GERENTE_FROTA: {
 		Dashboard: '/dashboard',
 		Usuários: '/admin/usuarios',
-		'Cadastrar frota': '/admin/cadastrar-frota',
-		'Cadastrar cliente': '/cadastrar-cliente'
+		Clientes: '/clientes',
+		Frotas: '/admin/frotas'
 	},
 	ADMIN: {
 		Dashboard: '/dashboard',
 		Usuários: '/admin/usuarios',
-		'Cadastrar Usuário': '/admin/cadastrar-usuario',
-		'Cadastrar cliente': '/cadastrar-cliente',
-		'Cadastrar frota': '/admin/cadastrar-frota'
+		Clientes: '/clientes',
+		Frotas: '/admin/frotas'
 	}
 }
 
-export { sidebarRoutesPerRole }
+export { sidebarRoutesPerRole, usePermissionNavigate }
 export default AppRoutes
