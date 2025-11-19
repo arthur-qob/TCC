@@ -4,7 +4,8 @@
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
-		"dev": "cd .. && update-env.bat && cd frontend && vite --host",
+		"dev": "vite --host",
+		"dev:update": "cd .. && update-env.bat && cd frontend && vite --host",
 		"dev:localhost": "vite --host",
 		"tunnels:start": "cd .. && start-all-tunnels.bat",
 		"tunnels:config": "cd .. && update-cloudflare-env.bat",
