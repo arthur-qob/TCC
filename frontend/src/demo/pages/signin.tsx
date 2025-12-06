@@ -1,10 +1,9 @@
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react'
 import { useState } from 'react'
 import Spinner from '../components/spinner'
-import { useUser } from '../context/user'
 import { useNavigate } from 'react-router-dom'
 
-const SignInPage = () => {
+const SignInPageDemo = () => {
 	const [email, setEmail] = useState<string>('')
 	const [password, setPassword] = useState<string>('')
 	const [showPassword, setShowPassword] = useState<boolean>(false)
@@ -16,7 +15,6 @@ const SignInPage = () => {
 	})
 	const [loading, setLoading] = useState(false)
 
-	const { signin } = useUser()
 	const navigate = useNavigate()
 
 	const togglePasswordVisibility = () => {
@@ -54,27 +52,11 @@ const SignInPage = () => {
 			return
 		}
 
+		navigate('/demo/dashboard')
+
 		console.log('Starting signin process...')
 		setLoading(true)
 		setErrors({ email: null, password: null, general: null })
-
-		signin({ email, password })
-			.then(() => {
-				console.log('Signin successful, navigating...')
-				navigate('/dashboard')
-			})
-			.catch((e) => {
-				console.log('Signin failed:', e)
-				setErrors({
-					email: null,
-					password: null,
-					general: e.message || 'Invalid email or password'
-				})
-			})
-			.finally(() => {
-				console.log('Signin process complete, setting loading to false')
-				setLoading(false)
-			})
 	}
 
 	return (
@@ -202,4 +184,4 @@ const SignInPage = () => {
 	)
 }
 
-export default SignInPage
+export default SignInPageDemo

@@ -16,6 +16,8 @@ public class ClienteMapper {
 		if (dto.getCnpj() != null && !dto.getCnpj().isEmpty()) {
 			c.setCnpj(dto.getCnpj());
 		}
+		c.setTelefone(dto.getTelefone());
+		c.setObservacoes(dto.getObservacoes());
 		return c;
 	}
 
@@ -26,6 +28,8 @@ public class ClienteMapper {
 		dto.setEmail(c.getEmail());
 		dto.setCpf(c.getCpf());
 		dto.setCnpj(c.getCnpj());
+		dto.setTelefone(c.getTelefone());
+		dto.setObservacoes(c.getObservacoes());
 		return dto;
 	}
 }

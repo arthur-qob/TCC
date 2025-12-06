@@ -87,7 +87,6 @@ HELP.md
 
 # Environment files
 .env*
-!.env.example
 
 # Credentials & Secrets
 *.pem
@@ -108,6 +107,7 @@ credentials.json
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+*.bat
 
 # Linux
 *~

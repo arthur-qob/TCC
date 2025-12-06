@@ -5,6 +5,8 @@ CREATE TABLE cliente (
     email VARCHAR(255) NOT NULL,
     cpf VARCHAR(14),
     cnpj VARCHAR(18),
+    telefone VARCHAR(20),
+    observacoes TEXT,
     CONSTRAINT check_cpf_or_cnpj CHECK (cpf IS NOT NULL OR cnpj IS NOT NULL)
 );
 

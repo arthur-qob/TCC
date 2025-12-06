@@ -1,3 +1,4 @@
+import type { CriarClienteBaseDTO, CriarPedidoDTO } from '@/utils/types'
 import { api } from '../utils/api'
 
 interface CreateUserBaseDTO {
@@ -18,12 +19,6 @@ export const userService = {
 	// List all users
 	getAllUsers: async () => {
 		const response = await api.get('/users')
-		return response.data
-	},
-
-	// List all clients
-	getAllClients: async () => {
-		const response = await api.get('/clientes')
 		return response.data
 	},
 
@@ -67,5 +62,48 @@ export const userService = {
 	createFocal: async (data: CreateUserBaseDTO) => {
 		const response = await api.post('/focais', data)
 		return response.data
+	},
+
+	// Clientes
+	getAllClients: async () => {
+		const response = await api.get('/clientes')
+		return response.data
+	},
+
+	createCliente: async (data: CriarClienteBaseDTO) => {
+		const response = await api.post('/clientes', data)
+
+		return response
+	},
+
+	deleteCliente: async (clienteId: number) => {
+		const response = await api.delete(`/clientes/${clienteId}`)
+		return response.data
+	},
+
+	// Pedidos
+	getAllPedidos: async () => {
+		const response = await api.get('/pedidos')
+		return response
+	},
+
+	getPedidoById: async (pedidoId: number) => {
+		const response = await api.get(`/pedidos/${pedidoId}`)
+		return response
+	},
+
+	createPedido: async (data: CriarPedidoDTO) => {
+		const response = await api.post('/pedidos', data)
+		return response
+	},
+
+	updatePedidoById: async (pedidoId: number, data: CriarPedidoDTO) => {
+		const response = await api.put(`/pedidos/${pedidoId}`, data)
+		return response
+	},
+
+	deletePedidoById: async (pedidoId: number) => {
+		const response = await api.delete(`/pedidos/${pedidoId}`)
+		return response
 	}
 }

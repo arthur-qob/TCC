@@ -1,5 +1,6 @@
 package com.backend.dto;
 
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -21,4 +22,13 @@ public class CriarClienteDTO {
 	private String cpf;
 
 	private String cnpj;
+
+	private String telefone;
+
+	private String observacoes;
+
+	@AssertTrue(message = "CPF ou CNPJ deve ser fornecido")
+	private boolean isCpfOrCnpjPresent() {
+		return (cpf != null && !cpf.isBlank()) || (cnpj != null && !cnpj.isBlank());
+	}
 }

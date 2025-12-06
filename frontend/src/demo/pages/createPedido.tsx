@@ -4,23 +4,23 @@ import {
 	TipoOperacao,
 	StatusPedido
 } from '@/utils/types/pedido.types'
+import { type Cliente } from '@/utils/types/cliente.types'
 import { Container, Text } from '../components/themed'
 import { useTheme } from '@/context/theme'
 import { usePermissionNavigate } from '@/utils/routes'
-import CustomSelect from '@/components/select'
+import CustomSelect from '../components/select'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { ptBR } from 'date-fns/locale'
-import { ColorHex } from '@/constants/colors'
-import { userService } from '@/services/userService'
-import toast from '@/components/toast'
+import { ColorHex } from '../constants/colors'
+import toast from '../components/toast'
+import { mockClientes, simulateApiDelay } from '../data/mockData'
 
 const CreatePedidoPage = () => {
 	const navigate = usePermissionNavigate()
 	const { actualTheme } = useTheme()
-
-	const [clientes, setClientes] = useState([])
+	const [clientes, setClientes] = useState<Cliente[]>([])
 
 	const [selectedClient, setSelectedClient] = useState('')
 	const [origem, setOrigem] = useState<string | null>(null)
@@ -43,8 +43,8 @@ const CreatePedidoPage = () => {
 		try {
 			setIsLoading(true)
 			setError(null)
-			const data = await userService.getAllClients()
-			setClientes(data)
+			await simulateApiDelay()
+			setClientes(mockClientes)
 		} catch (err: any) {
 			console.error('Error loading users:', err)
 			setError(
@@ -95,7 +95,7 @@ const CreatePedidoPage = () => {
 		e.preventDefault()
 		setError(null)
 
-		console.log({
+		const pedidoData = {
 			client: selectedClient,
 			programador: selectedProgramador,
 			date: selectedDate,
@@ -104,14 +104,19 @@ const CreatePedidoPage = () => {
 			origem,
 			destino,
 			observacoes
-		})
+		}
+
+		console.log('Pedido created (DEMO):', pedidoData)
 
 		try {
-			// Implementar lógica de criação do pedido aqui
+			setIsLoading(true)
+			await simulateApiDelay()
 
 			// Após criação bem-sucedida, navegar de volta para a lista de pedidos
-			navigate('/pedidos')
+			alert('Pedido criado com sucesso!')
+			navigate('/demo/pedidos')
 		} catch (err: any) {
+			setError('Erro ao criar pedido. Tente novamente.')
 		} finally {
 			setIsLoading(false)
 		}

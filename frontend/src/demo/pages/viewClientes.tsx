@@ -1,18 +1,17 @@
-import { DataTable, type Column } from '@/components/dataTable'
-import Spinner from '@/components/spinner'
-import { Container, Text } from '@/components/themed'
-import { ColorHex, getColor } from '@/constants/colors'
+import { DataTable, type Column } from '../components/dataTable'
+import Spinner from '../components/spinner'
+import { Container, Text } from '../components/themed'
+import { ColorHex, getColor } from '../constants/colors'
 import { useTheme } from '@/context/theme'
-import { userService } from '@/services/userService'
 import { usePermissionNavigate } from '@/utils/routes'
 import type { Cliente } from '@/utils/types'
 import { useEffect, useState } from 'react'
 import { Checkbox } from '@mui/material'
-import { useUser } from '@/context/user'
+import { mockClientes, mockUsuarios, simulateApiDelay } from '../data/mockData'
 
 const ClientesPage = () => {
 	const navigate = usePermissionNavigate()
-	const { user } = useUser()
+	const user = mockUsuarios[0] as any
 	const [clientes, setClientes] = useState<Cliente[]>([])
 	const [isLoading, setIsLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
@@ -30,8 +29,8 @@ const ClientesPage = () => {
 		try {
 			setIsLoading(true)
 			setError(null)
-			const data = await userService.getAllClients()
-			setClientes(data)
+			await simulateApiDelay()
+			setClientes(mockClientes)
 		} catch (err: any) {
 			console.error('Error loading users:', err)
 			setError(
@@ -125,15 +124,12 @@ const ClientesPage = () => {
 			setIsDeleting(true)
 			setError(null)
 
-			// Delete all selected clientes
-			await Promise.all(
-				Array.from(selectedClientes).map((clienteId) =>
-					userService.deleteCliente(clienteId)
-				)
-			)
+			await simulateApiDelay()
 
-			// Reload users list
-			await loadClients()
+			// Filter out deleted clientes from local state
+			setClientes((prev) =>
+				prev.filter((cliente) => !selectedClientes.has(cliente.id))
+			)
 			setSelectedClientes(new Set())
 		} catch (err: any) {
 			console.error('Error deleting clients:', err)

@@ -1,15 +1,18 @@
 // Cliente types
 export interface Cliente {
 	id: number
-	name: string
+	nome: string
 	cpfCnpj: string
 	email: string
-	telefone: string
+	telefone?: string
+	observacoes?: string
 }
 
-export interface CriarCliente {
-	name: string
-	cpfCnpj: string
+export interface CriarClienteBaseDTO {
+	nome: string
 	email: string
-	telefone: string
+	cpf?: string
+	cnpj?: string
+	telefone?: string
+	observacoes?: string
 }

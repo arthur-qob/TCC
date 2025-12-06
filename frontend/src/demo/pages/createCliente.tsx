@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Container, Text } from '../components/themed'
 import { useTheme } from '@/context/theme'
-import { ColorHex } from '@/constants/colors'
-import { userService } from '@/services/userService'
+import { ColorHex } from '../constants/colors'
 import { usePermissionNavigate } from '@/utils/routes'
-import Spinner from '@/components/spinner'
-import toast from '@/components/toast'
+import Spinner from '../components/spinner'
+import toast from '../components/toast'
 import type { CriarClienteBaseDTO } from '@/utils/types/cliente.types'
+import { simulateApiDelay } from '../data/mockData'
 
 const CreateClientePage = () => {
 	const { actualTheme } = useTheme()
@@ -114,21 +114,16 @@ const CreateClientePage = () => {
 		setLoading(true)
 
 		try {
-			const response = await userService.createCliente(baseData)
-			console.log('Client created successfully:', response)
+			await simulateApiDelay()
+			console.log('Client created successfully (DEMO):', baseData)
 
 			handleLimpar()
 			alert('Cliente cadastrado com sucesso!')
-			navigate('/clientes')
+			navigate('/demo/clientes')
 		} catch (err: any) {
 			console.error('Error creating client:', err)
-			console.error('Error response:', err.response)
-			console.error('Error data:', err.response?.data)
 			const errorMessage =
-				err.response?.data?.message ||
-				err.response?.data?.errors?.[0] ||
-				err.message ||
-				'Erro ao criar cliente. Tente novamente.'
+				err.message || 'Erro ao criar cliente. Tente novamente.'
 			setError(errorMessage)
 		} finally {
 			setLoading(false)

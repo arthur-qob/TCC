@@ -3,14 +3,10 @@ import { usePermissionNavigate } from '@/utils/routes'
 import CustomSelect from '../../components/select'
 import { Container, Text } from '../../components/themed'
 import { useTheme } from '@/context/theme'
-import type { UserRole } from '../../utils/types'
-import {
-	CategoriasMotorista,
-	StatusMotorista,
-	UserRoles
-} from '../../utils/types'
-import { userService } from '../../services/userService'
-import { ColorHex } from '@/constants/colors'
+import type { UserRole } from '@/utils/types'
+import { CategoriasMotorista, StatusMotorista, UserRoles } from '@/utils/types'
+import { ColorHex } from '../../constants/colors'
+import { simulateApiDelay } from '../../data/mockData'
 
 const CreateUsuarioPage = () => {
 	const { actualTheme } = useTheme()
@@ -70,44 +66,27 @@ const CreateUsuarioPage = () => {
 				dataInicio: new Date().toISOString().split('T')[0]
 			}
 
-			console.log('Creating user with role:', selectedRole)
-			console.log('Data:', baseData)
+			console.log('Creating user with role (DEMO):', selectedRole)
+			console.log('Data (DEMO):', baseData)
 
-			let response
-			switch (selectedRole) {
-				case UserRoles.ADMIN:
-					response = await userService.createAdmin(baseData)
-					break
-				case UserRoles.PROGRAMADOR:
-					response = await userService.createProgramador(baseData)
-					break
-				case UserRoles.MOTORISTA:
-					response = await userService.createMotorista({
-						...baseData,
-						categoria: categHabilitacao!,
-						status: statusMotorista,
-						frotaId: frotaId ? parseInt(frotaId) : undefined
-					})
-					break
-				case UserRoles.GERENTE_FROTA:
-					response = await userService.createGerenteFrota(baseData)
-					break
-				case UserRoles.GERENTE_RISCO:
-					response = await userService.createGerenteRisco(baseData)
-					break
-				case UserRoles.FOCAL:
-					response = await userService.createFocal(baseData)
-					break
-				default:
-					throw new Error('Tipo de usuário inválido')
-			}
+			await simulateApiDelay()
 
-			console.log('User created successfully:', response)
+			const userData =
+				selectedRole === UserRoles.MOTORISTA
+					? {
+							...baseData,
+							categoria: categHabilitacao!,
+							status: statusMotorista,
+							frotaId: frotaId ? parseInt(frotaId) : undefined
+					  }
+					: baseData
+
+			console.log('User created successfully (DEMO):', userData)
 
 			// Success - clear form and navigate
 			handleLimpar()
 			alert('Usuário criado com sucesso!')
-			navigate('/admin/usuarios')
+			navigate('/demo/admin/usuarios')
 		} catch (err: any) {
 			console.error('Error creating user:', err)
 			console.error('Error response:', err.response)

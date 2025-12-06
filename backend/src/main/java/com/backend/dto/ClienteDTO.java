@@ -12,4 +12,6 @@ public class ClienteDTO {
 	private String email;
 	private String cpf;
 	private String cnpj;
+	private String telefone;
+	private String observacoes;
 }

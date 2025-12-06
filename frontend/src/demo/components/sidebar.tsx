@@ -12,12 +12,12 @@ import {
 	BookUser
 } from 'lucide-react'
 import { useTheme } from '@/context/theme'
-import { usePermissionNavigate } from '@/utils/routes'
-import { useUser } from '../context/user'
-import { sidebarRoutesPerRole } from '../utils/routes'
+import { sidebarRoutesPerRole } from '../utils/demoRoutes'
 import { useMemo } from 'react'
 import MenuButton from './menuButton'
 import { capitalizeFirst, getInitials2 } from '@/utils/stringFormatters'
+import { mockUsuarios } from '../data/mockData'
+import { useNavigate } from 'react-router-dom'
 
 interface MenuItem {
 	icon: React.ComponentType<{ size?: number; className?: string }>
@@ -34,8 +34,8 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 	const [isOpen, setIsOpen] = useState(false)
 	const [isCollapsed, setIsCollapsed] = useState(true)
 	const { actualTheme } = useTheme()
-	const navigate = usePermissionNavigate()
-	const { user, logout } = useUser()
+	const navigate = useNavigate()
+	const user = mockUsuarios[0] as any // Simulated logged-in user
 
 	// Map menu labels to icons
 	const iconMap: Record<
@@ -70,7 +70,30 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 		}))
 	}, [user?.tipo])
 
-	const handleNavigation = () => {
+	const handleNavigation = (href: string) => {
+		// Verify if user has access to this route
+		if (!user?.tipo) {
+			console.warn('User has no role defined')
+			return
+		}
+
+		const userRoutes =
+			sidebarRoutesPerRole[user.tipo as keyof typeof sidebarRoutesPerRole]
+
+		if (!userRoutes) {
+			console.warn(`No routes defined for role: ${user.tipo}`)
+			return
+		}
+
+		// Check if the href is in the user's allowed routes
+		const hasAccess = Object.values(userRoutes).includes(href)
+
+		if (!hasAccess) {
+			console.warn(`User does not have access to: ${href}`)
+			return
+		}
+
+		navigate(href)
 		setIsOpen(false)
 		setIsCollapsed(true)
 	}
@@ -169,8 +192,7 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 								<li key={index}>
 									<button
 										onClick={() => {
-											navigate(item.href)
-											handleNavigation()
+											handleNavigation(item.href)
 										}}
 										className={`flex items-center ${
 											isCollapsed ? 'justify-center' : ''
@@ -270,7 +292,6 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 							<>
 								<button
 									onClick={async () => {
-										await logout()
 										navigate('/signin')
 									}}
 									className={`mt-2 w-full flex items-center ${

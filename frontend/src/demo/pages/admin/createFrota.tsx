@@ -2,7 +2,7 @@ import { useState } from 'react'
 import CustomSelect from '../../components/select'
 import { Container, Text } from '../../components/themed'
 import { useTheme } from '@/context/theme'
-import { TipoFrota } from '../../utils/types'
+import { TipoFrota } from '@/utils/types'
 import { ColorHex, getColor } from '@/constants/colors'
 
 const CreateFrotaPage = () => {

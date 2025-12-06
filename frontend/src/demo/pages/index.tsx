@@ -2,17 +2,16 @@ import { Eye, SquarePen, UserPlus } from 'lucide-react'
 import { Container, Text } from '../components/themed'
 import { DataTable, type Column } from '../components/dataTable'
 import { usePermissionNavigate } from '@/utils/routes'
-import { useUser } from '@/context/user'
-import { UserRoles, type Pedido } from '@/utils/types'
+import { StatusPedido, UserRoles, type Pedido } from '@/utils/types'
 import { capitalizeFirst } from '@/utils/stringFormatters'
 import { useTheme } from '@/context/theme'
-import { ColorHex } from '@/constants/colors'
+import { ColorHex } from '../constants/colors'
 import { useEffect, useState } from 'react'
-import { userService } from '@/services/userService'
-import Spinner from '@/components/spinner'
+import Spinner from '../components/spinner'
+import { mockPedidos, mockUsuarios, simulateApiDelay } from '../data/mockData'
 
 const HomePage = () => {
-	const { user } = useUser()
+	const user = mockUsuarios[0] as any // Simulated logged-in user
 	const { actualTheme } = useTheme()
 	const navigate = usePermissionNavigate()
 	const [pedidos, setPedidos] = useState<Pedido[]>([])
@@ -23,8 +22,8 @@ const HomePage = () => {
 		try {
 			setIsLoading(true)
 			setError(null)
-			const response = await userService.getAllPedidos()
-			setPedidos(response.data)
+			await simulateApiDelay()
+			setPedidos(mockPedidos)
 		} catch (err: any) {
 			console.error('Error loading orders:', err)
 			setError(
@@ -40,13 +39,21 @@ const HomePage = () => {
 		loadPedidos()
 	}, [])
 
-	const statusColors: Record<string, { bg: string; text: string }> = {
-		Programando: { bg: 'bg-yellow-300', text: 'text-yellow-700' },
-		Transporte: { bg: 'bg-blue-300', text: 'text-blue-700' },
-		Concluído: { bg: 'bg-green-300', text: 'text-green-700' },
-		Cancelado: { bg: 'bg-red-300', text: 'text-red-700' },
-		'Em Análise': { bg: 'bg-purple-300', text: 'text-purple-700' },
-		Pendente: { bg: 'bg-orange-300', text: 'text-orange-700' }
+	const statusColors: Record<StatusPedido, { bg: string; text: string }> = {
+		[StatusPedido.PENDENTE]: {
+			bg: 'bg-yellow-300',
+			text: 'text-yellow-700'
+		},
+		[StatusPedido.APROVADO]: { bg: 'bg-blue-300', text: 'text-blue-700' },
+		[StatusPedido.EM_ANDAMENTO]: {
+			bg: 'bg-purple-300',
+			text: 'text-purple-700'
+		},
+		[StatusPedido.CONCLUIDO]: {
+			bg: 'bg-green-300',
+			text: 'text-green-700'
+		},
+		[StatusPedido.CANCELADO]: { bg: 'bg-red-300', text: 'text-red-700' }
 	}
 
 	const columns: Column<Pedido>[] = [
@@ -65,16 +72,19 @@ const HomePage = () => {
 		{
 			id: 'statusPedido',
 			label: 'STATUS',
-			render: (value) => (
-				<p
-					className={`w-fit mx-auto ${
-						statusColors[value]?.bg || 'bg-gray-300'
-					} ${
-						statusColors[value]?.text || 'text-gray-700'
-					} p-2 rounded-full`}>
-					{value}
-				</p>
-			)
+			render: (value) => {
+				const status = value as StatusPedido
+				return (
+					<p
+						className={`w-fit mx-auto ${
+							statusColors[status]?.bg || 'bg-gray-300'
+						} ${
+							statusColors[status]?.text || 'text-gray-700'
+						} p-2 rounded-full`}>
+						{status}
+					</p>
+				)
+			}
 		},
 		{
 			id: 'dataCriacao',
@@ -114,7 +124,7 @@ const HomePage = () => {
 		user?.tipo === UserRoles.PROGRAMADOR
 
 	const handleRowClick = (order: Pedido) => {
-		navigate(`/cadastrar-pedido?id=${order.id}`)
+		navigate(`/demo/cadastrar-pedido?id=${order.id}`)
 	}
 
 	return (
@@ -127,14 +137,14 @@ const HomePage = () => {
 			}`}>
 			<div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 w-full'>
 				<Text className='w-fit capitalize text-2xl font-medium'>
-					{user?.tipo ? capitalizeFirst(user.tipo) : 'No user'}
+					Pedidos
 				</Text>
 				{(user?.tipo === UserRoles.FOCAL ||
 					user?.tipo === UserRoles.GERENTE_FROTA ||
 					user?.tipo === UserRoles.ADMIN) && (
 					<button
 						className='w-full sm:w-fit bg-[rgb(15,219,110)] hover:bg-[hsla(149,87%,40%,1.00)] transition-colors duration-300 text-white px-3 sm:px-4 py-2 sm:py-3 rounded-xl shadow-lg text-sm sm:text-base'
-						onClick={() => navigate('/cadastrar-pedido')}>
+						onClick={() => navigate('/demo/cadastrar-pedido')}>
 						Criar novo pedido
 					</button>
 				)}

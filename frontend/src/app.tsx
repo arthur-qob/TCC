@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import Sidebar from './components/sidebar'
+// import Sidebar from './components/sidebar'
+import Sidebar from './demo/components/sidebar'
 import ScrollToTop from './components/scrollToTop'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
@@ -9,12 +10,14 @@ import { ToggleButton, useTheme } from './context/theme'
 import { useUser } from './context/user'
 import Spinner from './components/spinner'
 import { Bell } from 'lucide-react'
-import AppRoutes from './utils/routes'
+// import AppRoutes from './utils/routes'
 import Toast from './components/toast'
+import DemoRoutes from './demo/utils/demoRoutes'
 
 const App = () => {
 	const location = useLocation()
-	const noSidebarRoutes = ['/', '/signin']
+	// const noSidebarRoutes = ['/', '/signin']
+	const noSidebarRoutes = ['/', '/demo/signin']
 	const { isCheckingSession } = useUser()
 	const { actualTheme } = useTheme()
 
@@ -62,7 +65,8 @@ const App = () => {
 					<ToggleButton />
 				</TopBar>
 			)}
-			<AppRoutes />
+			{/* <AppRoutes /> */}
+			<DemoRoutes />
 			<ScrollToTop />
 		</div>
 	)

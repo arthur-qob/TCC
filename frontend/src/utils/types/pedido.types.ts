@@ -9,10 +9,13 @@ export const TipoCarga = {
 export type TipoCarga = (typeof TipoCarga)[keyof typeof TipoCarga]
 
 export const TipoOperacao = {
-	IMPORTACAO: 'IMPORTACAO',
-	EXPORTACAO: 'EXPORTACAO',
-	CABOTAGEM: 'CABOTAGEM',
-	TRANSBORDO: 'TRANSBORDO'
+	REDEX: 'REDEX',
+	RODOV: 'RODOV',
+	VAZIO: 'VAZIO',
+	'TERC. REDEX': 'TERC. REDEX',
+	'TERC. VAZIO': 'TERC. VAZIO',
+	'TERC. DEPOT': 'TERC. DEPOT',
+	'TERC. RODOV': 'TERC. RODOV'
 } as const
 
 export type TipoOperacao = (typeof TipoOperacao)[keyof typeof TipoOperacao]
@@ -28,21 +31,22 @@ export const StatusPedido = {
 export type StatusPedido = (typeof StatusPedido)[keyof typeof StatusPedido]
 export interface Pedido {
 	id: number
-	dataExecucao: string // ISO date string
-	tipoCarga: TipoCarga
+	dataCriacao?: string // ISO date string
+	dataExecucao?: string // ISO date string
+	tipoCarga?: TipoCarga
 	numContainer?: string
-	qtdCarretas: number
-	tipoOperacao: TipoOperacao
+	qtdCarretas?: number
+	tipoOperacao?: TipoOperacao
 	statusPedido: StatusPedido
 	focalId: number
-	programadorId: number
-	gerenteFrotaId: number
-	gerenteRiscoId: number
-	motoristaId: number
-	clienteId: number
+	programadorId?: number
+	gerenteFrotaId?: number
+	gerenteRiscoId?: number
+	motoristaId?: number
+	clienteId?: number
 }
 
-export interface CriarPedido {
+export interface CriarPedidoDTO {
 	dataExecucao: string
 	tipoCarga: TipoCarga
 	numContainer?: string

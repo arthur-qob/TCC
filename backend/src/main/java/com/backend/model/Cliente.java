@@ -8,7 +8,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-// import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -34,14 +33,17 @@ public class Cliente {
 	@Column(name = "email", nullable = false)
 	private String email;
 
-	// Cliente tem que ter ou CPF ou CNPJ (os dois não podem ser null ao mesmo
-	// tempo)
-
 	@Column(name = "cpf")
 	private String cpf;
 
 	@Column(name = "cnpj")
 	private String cnpj;
+
+	@Column(name = "telefone")
+	private String telefone;
+
+	@Column(name = "observacoes", length = 500)
+	private String observacoes;
 
 	@OneToMany(mappedBy = "cliente")
 	private Set<Rota> rotas = new HashSet<>();
