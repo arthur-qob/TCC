@@ -9,6 +9,7 @@ import CreatePedidoPage from '../pages/createPedido'
 import CreateUsuarioPage from '../pages/admin/createUsuario'
 import CreateFrotaPage from '../pages/admin/createFrota'
 import SignInPageDemo from '../pages/signin'
+import EditPedidoPage from '../pages/editPedido'
 
 const DemoRoutes = () => {
 	return (
@@ -51,10 +52,6 @@ const DemoRoutes = () => {
 				element={<RotasPage />}
 			/>
 			<Route
-				path='/demo/cadastrar-pedido'
-				element={<CreatePedidoPage />}
-			/>
-			<Route
 				path='/demo/admin/cadastrar-usuario'
 				element={<CreateUsuarioPage />}
 			/>
@@ -64,7 +61,7 @@ const DemoRoutes = () => {
 			/>
 			<Route
 				path='/demo/pedidos/editar/:id'
-				element={<CreatePedidoPage />}
+				element={<EditPedidoPage />}
 			/>
 			<Route
 				path='/demo/admin/cadastrar-frota'

@@ -1,35 +1,34 @@
+import { useNavigate, useParams } from 'react-router-dom'
+import { Container, Text } from '../components/themed'
+import { ColorHex } from '../constants/colors'
+import { useTheme } from '@/context/theme'
 import { useEffect, useState } from 'react'
 import {
+	type Cliente,
+	type Pedido,
+	type Rota,
 	TipoCarga,
-	TipoOperacao,
-	StatusPedido
-} from '@/utils/types/pedido.types'
-import { type Cliente } from '@/utils/types/cliente.types'
-import { Container, Text } from '../components/themed'
-import { useTheme } from '@/context/theme'
-import CustomSelect from '../components/select'
-import { DatePicker } from '@mui/x-date-pickers/DatePicker'
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
-import { ptBR } from 'date-fns/locale'
-import { format } from 'date-fns'
-import { ColorHex } from '../constants/colors'
-import toast from '../components/toast'
+	TipoOperacao
+} from '@/utils/types'
 import {
 	mockClientes,
 	mockPedidos,
 	mockRotas,
-	mockUsuarios,
 	simulateApiDelay
 } from '../data/mockData'
-import type { Pedido, Rota } from '@/utils/types'
-import { useNavigate } from 'react-router-dom'
+import CustomSelect from '../components/select'
+import toast from '../components/toast'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { ptBR } from 'date-fns/locale'
+import { DatePicker } from '@mui/x-date-pickers/DatePicker'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 
-const CreatePedidoPage = () => {
+const EditPedidoPage = () => {
+	const { id: idPedido } = useParams()
 	const navigate = useNavigate()
 	const { actualTheme } = useTheme()
 
-	const [pedidos, setPedidos] = useState<Pedido[]>([])
+	const [pedido, setPedido] = useState<Pedido | null>(null)
 	const [clientes, setClientes] = useState<Cliente[]>([])
 	const [rotas, setRotas] = useState<Rota[]>([])
 	const [origens, setOrigens] = useState<string[]>([])
@@ -52,33 +51,37 @@ const CreatePedidoPage = () => {
 	const [isLoading, setIsLoading] = useState(false)
 
 	useEffect(() => {
-		loadPedidos()
+		loadPedido()
 		loadClients()
 		loadRotas()
 	}, [])
+
+	useEffect(() => {
+		if (pedido) {
+			setSelectedCliente(
+				clientes.find((c) => c.id === pedido.clienteId)?.nome || ''
+			)
+			setSelectedOrigem(
+				rotas.find((r) => r.id === pedido.rotaId)?.origem || ''
+			)
+			setSelectedDestino(
+				rotas.find((r) => r.id === pedido.rotaId)?.destino || ''
+			)
+			setSelectedDataExecucao(
+				pedido.dataExecucao ? new Date(pedido.dataExecucao) : null
+			)
+			setSelectedTipoCarga(pedido.tipoCarga)
+			setSelectedTipoOperacao(pedido.tipoOperacao)
+			setQtdCarretas(pedido.qtdCarretas || 1)
+			setObservacoes(pedido.observacoes || '')
+		}
+	}, [pedido])
 
 	useEffect(() => {
 		if (rotas.length > 0) {
 			extractOrigemDestino()
 		}
 	}, [rotas])
-
-	const loadPedidos = async () => {
-		try {
-			setIsLoading(true)
-			setError(null)
-			await simulateApiDelay()
-			setPedidos(mockPedidos)
-		} catch (err: any) {
-			console.error('Error loading orders:', err)
-			setError(
-				err.response?.data?.message ||
-					'Erro ao carregar pedidos. Tente novamente.'
-			)
-		} finally {
-			setIsLoading(false)
-		}
-	}
 
 	const loadClients = async () => {
 		try {
@@ -126,7 +129,7 @@ const CreatePedidoPage = () => {
 		}
 	}
 
-	const extractOrigemDestino = () => {
+	const extractOrigemDestino = (rotaPedido?: Rota) => {
 		const origensSet = new Set<string>()
 		const destinosSet = new Set<string>()
 
@@ -138,98 +141,20 @@ const CreatePedidoPage = () => {
 		setDestinos(Array.from(destinosSet))
 	}
 
-	const handleLimpar = () => {
-		setSelectedCliente(null)
-		setSelectedDataExecucao(null)
-		setSelectedTipoCarga(null)
-		setSelectedTipoOperacao(null)
-		setQtdContainers(1)
-		setQtdCarretas(1)
-		setObservacoes('')
-		setSelectedOrigem(null)
-		setSelectedDestino(null)
-		setError(null)
-	}
-
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault()
-		setError(null)
-
-		if (
-			!selectedCliente ||
-			!selectedOrigem ||
-			!selectedDestino ||
-			!selectedTipoCarga ||
-			!selectedTipoOperacao ||
-			!selectedDataExecucao
-		) {
-			setError('Por favor, preencha todos os campos obrigatórios.')
-			return
-		}
-
-		const clienteId = mockClientes.find(
-			(c) => c.nome === selectedCliente
-		)?.id
-		const dataExecucao = format(selectedDataExecucao, 'yyyy-MM-dd')
-		const rotaId = mockRotas.find(
-			(r) => r.origem === selectedOrigem && r.destino === selectedDestino
-		)?.id
-
-		if (!clienteId) {
-			setError('Cliente não encontrado.')
-			return
-		}
-
-		if (!rotaId) {
-			setError(
-				'Não existe rota cadastrada para a origem e destino selecionados.'
-			)
-			return
-		}
-
+	const loadPedido = async () => {
 		try {
 			setIsLoading(true)
+			setError(null)
 			await simulateApiDelay()
-
-			const newPedido: Partial<Pedido> = {
-				id: Math.max(...pedidos.map((p) => p.id)) + 1,
-				clienteId: clienteId,
-				rotaId: rotaId,
-				tipoOperacao: selectedTipoOperacao,
-				tipoCarga: selectedTipoCarga,
-				numContainerNotaFiscal:
-					selectedTipoCarga === TipoCarga.CONTAINER
-						? `CONT${Date.now()}`
-						: null,
-				qtdCarretas: qtdCarretas,
-				dataExecucao: dataExecucao,
-				dataCriacao: format(new Date(), 'yyyy-MM-dd'),
-				statusPedido: StatusPedido.PENDENTE,
-				focalId: Math.floor(Math.random() * mockUsuarios.length) + 1,
-				programadorId: null,
-				gerenteFrotaId: null,
-				gerenteRiscoId: null,
-				motoristaId: null
-			}
-
-			setPedidos([...pedidos, newPedido as Pedido])
-			mockPedidos.push(newPedido as Pedido)
-
-			toast.emitToast({
-				type: 'success',
-				message: 'Pedido criado com sucesso!'
-			})
-
-			setTimeout(() => {
-				navigate('/demo/dashboard')
-			}, 1000)
+			setPedido(
+				mockPedidos.find((p) => p.id === Number(idPedido)) || null
+			)
 		} catch (err: any) {
-			console.error('Error creating pedido:', err)
-			setError('Erro ao criar pedido. Tente novamente.')
-			toast.emitToast({
-				type: 'error',
-				message: 'Erro ao criar pedido. Tente novamente.'
-			})
+			console.error('Error loading orders:', err)
+			setError(
+				err.response?.data?.message ||
+					'Erro ao carregar pedidos. Tente novamente.'
+			)
 		} finally {
 			setIsLoading(false)
 		}
@@ -253,11 +178,15 @@ const CreatePedidoPage = () => {
 	const labelClassName = 'text-sm font-medium mb-1 block'
 
 	return (
-		<Container animate='fade-up'>
-			<Text
-				as='h1'
-				className='font-normal'>
-				Abrir Pedido
+		<Container
+			animate='fade-up'
+			className={`${
+				actualTheme === 'dark'
+					? `bg-[${ColorHex.zinc[950]}]`
+					: `bg-[${ColorHex.white}]`
+			}`}>
+			<Text className='w-fit capitalize text-2xl font-medium'>
+				Editar Pedido #{idPedido}
 			</Text>
 
 			<div
@@ -271,7 +200,7 @@ const CreatePedidoPage = () => {
 					}`
 				}}>
 				<form
-					onSubmit={handleSubmit}
+					// onSubmit={handleSubmit}
 					className='grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8'>
 					{error && (
 						<div className='md:col-span-2 p-4 rounded-lg bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700'>
@@ -293,7 +222,7 @@ const CreatePedidoPage = () => {
 								id='cliente'
 								value={selectedCliente || ''}
 								options={Object.fromEntries(
-									clientes.map((client: any) => [
+									mockClientes.map((client: any) => [
 										client.nome,
 										client.nome
 									])
@@ -650,7 +579,8 @@ const CreatePedidoPage = () => {
 									? ColorHex.red[600]
 									: ColorHex.red[500]
 							}}
-							onClick={handleLimpar}>
+							// onClick={handleLimpar}
+						>
 							Limpar Formulário
 						</button>
 						<button
@@ -688,4 +618,4 @@ const CreatePedidoPage = () => {
 	)
 }
 
-export default CreatePedidoPage
+export default EditPedidoPage

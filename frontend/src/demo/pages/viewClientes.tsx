@@ -23,7 +23,7 @@ const ClientesPage = () => {
 
 	useEffect(() => {
 		loadClients()
-	}, [])
+	}, [mockClientes])
 
 	const loadClients = async () => {
 		try {

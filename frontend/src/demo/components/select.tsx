@@ -13,8 +13,8 @@ import { ChevronsUpDown } from 'lucide-react'
 import { useTheme } from '@/context/theme'
 
 type CustomSelectProps = {
-	defaultValue?: string
-	options: Record<string, string>
+	value?: string
+	options: Record<string, string> | string[]
 	onChange?: (value: string) => void
 	placeholder?: string
 	className?: string
@@ -22,7 +22,7 @@ type CustomSelectProps = {
 }
 
 const CustomSelect = ({
-	defaultValue = '',
+	value = '',
 	options = {},
 	onChange,
 	placeholder = 'Selecione uma opção',
@@ -31,17 +31,22 @@ const CustomSelect = ({
 }: CustomSelectProps) => {
 	const { actualTheme } = useTheme()
 
+	// Normalize options to always be Record<string, string>
+	const normalizedOptions: Record<string, string> = Array.isArray(options)
+		? Object.fromEntries(options.map((value) => [value, value]))
+		: options
+
 	return (
 		<Select
-			defaultValue={defaultValue}
-			onChange={(_, value) => onChange?.(value as string)}
+			value={value}
+			onChange={(_, newValue) => onChange?.(newValue as string)}
 			slotProps={{
 				root: { actualTheme } as any,
 				listbox: { actualTheme } as any
 			}}
 			className={className}
 			id={id}>
-			{!defaultValue && (
+			{!value && (
 				<Option
 					value=''
 					disabled
@@ -49,10 +54,10 @@ const CustomSelect = ({
 					{placeholder}
 				</Option>
 			)}
-			{Object.entries(options).map(([label, value]) => (
+			{Object.entries(normalizedOptions).map(([label, optionValue]) => (
 				<Option
-					value={value}
-					key={value}
+					value={optionValue}
+					key={optionValue}
 					actualTheme={actualTheme}>
 					{label}
 				</Option>

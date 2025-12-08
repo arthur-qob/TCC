@@ -292,7 +292,7 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 							<>
 								<button
 									onClick={async () => {
-										navigate('/signin')
+										navigate('/demo/signin')
 									}}
 									className={`mt-2 w-full flex items-center ${
 										isCollapsed ? '' : 'gap-3'

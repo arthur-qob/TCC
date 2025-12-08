@@ -31,25 +31,29 @@ export const StatusPedido = {
 export type StatusPedido = (typeof StatusPedido)[keyof typeof StatusPedido]
 export interface Pedido {
 	id: number
-	dataCriacao?: string // ISO date string
-	dataExecucao?: string // ISO date string
-	tipoCarga?: TipoCarga
-	numContainer?: string
-	qtdCarretas?: number
-	tipoOperacao?: TipoOperacao
+	dataCriacao: string
+	clienteId: number
+	dataExecucao: string | null
+	tipoOperacao: TipoOperacao
+	tipoCarga: TipoCarga
+	numContainerNotaFiscal: string | null
+	qtdContaineres: number | null
+	qtdCarretas: number | null
 	statusPedido: StatusPedido
+	observacoes?: string
 	focalId: number
-	programadorId?: number
-	gerenteFrotaId?: number
-	gerenteRiscoId?: number
-	motoristaId?: number
-	clienteId?: number
+	gerenteRiscoId: number | null
+	imo: string | null
+	programadorId: number | null
+	motoristaId: number | null
+	rotaId: number | null
+	gerenteFrotaId: number | null
 }
 
 export interface CriarPedidoDTO {
 	dataExecucao: string
 	tipoCarga: TipoCarga
-	numContainer?: string
+	numContainerNotaFiscal?: string
 	qtdCarretas: number
 	tipoOperacao: TipoOperacao
 	statusPedido: StatusPedido
@@ -59,4 +63,6 @@ export interface CriarPedidoDTO {
 	gerenteRiscoId: number
 	motoristaId: number
 	clienteId: number
+	rotaId?: number
+	observacoes?: string
 }

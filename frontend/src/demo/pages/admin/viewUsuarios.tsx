@@ -26,7 +26,7 @@ const UsersPage = () => {
 
 	useEffect(() => {
 		loadUsers()
-	}, [])
+	}, [mockUsuarios])
 
 	const loadUsers = async () => {
 		try {
@@ -108,7 +108,7 @@ const UsersPage = () => {
 		if (selectedUsers.size === users.length) {
 			setSelectedUsers(new Set())
 		} else {
-			setSelectedUsers(new Set(users.map((u) => u.idUser)))
+			setSelectedUsers(new Set(users.map((u) => u.id)))
 		}
 	}
 
@@ -132,8 +132,8 @@ const UsersPage = () => {
 			sortable: false,
 			render: (_, user) => (
 				<Checkbox
-					checked={selectedUsers.has(user.idUser)}
-					onChange={() => toggleUserSelection(user.idUser)}
+					checked={selectedUsers.has(user.id)}
+					onChange={() => toggleUserSelection(user.id)}
 					sx={{
 						color: '#9ca3af',
 						'&.Mui-checked': {
@@ -144,12 +144,12 @@ const UsersPage = () => {
 			)
 		},
 		{
-			id: 'idUser',
+			id: 'id',
 			label: 'ID',
 			sortable: true
 		},
 		{
-			id: 'name',
+			id: 'nome',
 			label: 'NOME',
 			sortable: true
 		},
@@ -191,7 +191,7 @@ const UsersPage = () => {
 
 			// Filter out deleted users from local state
 			setUsers((prev) =>
-				prev.filter((user) => !selectedUsers.has(user.idUser))
+				prev.filter((user) => !selectedUsers.has(user.id))
 			)
 			setSelectedUsers(new Set())
 		} catch (err: any) {
@@ -272,7 +272,7 @@ const UsersPage = () => {
 				<DataTable
 					columns={columns}
 					data={users}
-					getRowKey={(user) => user.idUser}
+					getRowKey={(user) => user.id}
 				/>
 			)}
 		</Container>

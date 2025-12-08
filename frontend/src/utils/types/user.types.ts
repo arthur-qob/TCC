@@ -13,16 +13,16 @@ export const UserRoles = {
 export type UserRole = (typeof UserRoles)[keyof typeof UserRoles]
 
 export interface Usuario {
-	idUser: number
-	name: string
+	id: number
+	nome: string
 	email: string
 	tipo?: UserRole // Role type, undefined for basic users
 }
 
 export interface CriarUsuario {
-	name: string
+	nome: string
 	email: string
-	password: string
+	senha: string
 }
 
 // Papel base type (for inheritance)
