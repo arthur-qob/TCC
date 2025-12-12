@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import { usePermissionNavigate } from '@/utils/routes'
 import { Checkbox } from '@mui/material'
 import { Container, Text } from '../../components/themed'
 import { DataTable, type Column } from '../../components/dataTable'
@@ -8,9 +7,10 @@ import Spinner from '../../components/spinner'
 import { ColorHex, getColor } from '../../constants/colors'
 import { useTheme } from '@/context/theme'
 import { mockUsuarios, simulateApiDelay } from '../../data/mockData'
+import { useNavigate } from 'react-router-dom'
 
 const UsersPage = () => {
-	const navigate = usePermissionNavigate()
+	const navigate = useNavigate()
 	const [users, setUsers] = useState<Usuario[]>([])
 	const [isLoading, setIsLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
