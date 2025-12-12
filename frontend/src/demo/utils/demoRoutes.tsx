@@ -36,6 +36,10 @@ const DemoRoutes = () => {
 				element={<UsersPage />}
 			/>
 			<Route
+				path='/demo/admin/cadastrar-usuario'
+				element={<CreateUsuarioPage />}
+			/>
+			<Route
 				path='/demo/clientes'
 				element={<ClientesPage />}
 			/>
@@ -50,10 +54,6 @@ const DemoRoutes = () => {
 			<Route
 				path='/demo/rotas'
 				element={<RotasPage />}
-			/>
-			<Route
-				path='/demo/admin/cadastrar-usuario'
-				element={<CreateUsuarioPage />}
 			/>
 			<Route
 				path='/demo/pedidos/novo'
