@@ -975,3 +975,48 @@ export const mockFrotas: Frota[] = [
 export const simulateApiDelay = (ms: number = 500): Promise<void> => {
 	return new Promise((resolve) => setTimeout(resolve, ms))
 }
+
+// LocalStorage helper functions for users
+const USUARIOS_STORAGE_KEY = 'demo_usuarios'
+
+export const getUsuariosFromStorage = (): Usuario[] => {
+	if (typeof window === 'undefined') return mockUsuarios
+	
+	const stored = localStorage.getItem(USUARIOS_STORAGE_KEY)
+	if (stored) {
+		try {
+			return JSON.parse(stored)
+		} catch (e) {
+			console.error('Error parsing usuarios from storage:', e)
+			return mockUsuarios
+		}
+	}
+	return mockUsuarios
+}
+
+export const saveUsuarioToStorage = (usuario: Omit<Usuario, 'id'>): Usuario => {
+	const usuarios = getUsuariosFromStorage()
+	const newId = Math.max(...usuarios.map(u => u.id), 0) + 1
+	const newUsuario: Usuario = {
+		...usuario,
+		id: newId
+	}
+	usuarios.push(newUsuario)
+	localStorage.setItem(USUARIOS_STORAGE_KEY, JSON.stringify(usuarios))
+	return newUsuario
+}
+
+export const deleteUsuariosFromStorage = (ids: number[]): void => {
+	const usuarios = getUsuariosFromStorage()
+	const filtered = usuarios.filter(u => !ids.includes(u.id))
+	localStorage.setItem(USUARIOS_STORAGE_KEY, JSON.stringify(filtered))
+}
+
+export const initializeUsuariosStorage = (): void => {
+	if (typeof window === 'undefined') return
+	
+	const stored = localStorage.getItem(USUARIOS_STORAGE_KEY)
+	if (!stored) {
+		localStorage.setItem(USUARIOS_STORAGE_KEY, JSON.stringify(mockUsuarios))
+	}
+}

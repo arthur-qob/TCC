@@ -6,7 +6,10 @@ import { useTheme } from '@/context/theme'
 import type { UserRole } from '@/utils/types'
 import { CategoriasMotorista, StatusMotorista, UserRoles } from '@/utils/types'
 import { ColorHex } from '../../constants/colors'
-import { simulateApiDelay } from '../../data/mockData'
+import {
+	simulateApiDelay,
+	saveUsuarioToStorage
+} from '../../data/mockData'
 
 const CreateUsuarioPage = () => {
 	const { actualTheme } = useTheme()
@@ -59,29 +62,21 @@ const CreateUsuarioPage = () => {
 		setIsLoading(true)
 
 		try {
-			const baseData = {
-				name: nome,
+			await simulateApiDelay()
+
+			const newUser = {
+				nome: nome,
 				email,
-				password,
-				dataInicio: new Date().toISOString().split('T')[0]
+				tipo: selectedRole
 			}
 
 			console.log('Creating user with role (DEMO):', selectedRole)
-			console.log('Data (DEMO):', baseData)
+			console.log('User data (DEMO):', newUser)
 
-			await simulateApiDelay()
-
-			const userData =
-				selectedRole === UserRoles.MOTORISTA
-					? {
-							...baseData,
-							categoria: categHabilitacao!,
-							status: statusMotorista,
-							frotaId: frotaId ? parseInt(frotaId) : undefined
-					  }
-					: baseData
-
-			console.log('User created successfully (DEMO):', userData)
+			// Save user to localStorage
+			const savedUser = saveUsuarioToStorage(newUser)
+			
+			console.log('User created successfully (DEMO):', savedUser)
 
 			// Success - clear form and navigate
 			handleLimpar()
@@ -221,7 +216,7 @@ const CreateUsuarioPage = () => {
 							</label>
 							<CustomSelect
 								id='role'
-								defaultValue={selectedRole || ''}
+								value={selectedRole || ''}
 								options={UserRoles}
 								onChange={(value) => {
 									if (
@@ -284,7 +279,7 @@ const CreateUsuarioPage = () => {
 									</label>
 									<CustomSelect
 										id='status'
-										defaultValue={statusMotorista}
+										value={statusMotorista}
 										options={StatusMotorista}
 										onChange={(value) =>
 											setStatusMotorista(
@@ -305,7 +300,7 @@ const CreateUsuarioPage = () => {
 									</label>
 									<CustomSelect
 										id='habilitacao'
-										defaultValue=''
+										value={categHabilitacao || ''}
 										options={CategoriasMotorista}
 										onChange={(value) =>
 											setCategHabilitacao(

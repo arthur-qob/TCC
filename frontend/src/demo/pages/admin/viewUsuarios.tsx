@@ -6,7 +6,12 @@ import type { Usuario } from '@/utils/types/user.types'
 import Spinner from '../../components/spinner'
 import { ColorHex, getColor } from '../../constants/colors'
 import { useTheme } from '@/context/theme'
-import { mockUsuarios, simulateApiDelay } from '../../data/mockData'
+import {
+	getUsuariosFromStorage,
+	deleteUsuariosFromStorage,
+	initializeUsuariosStorage,
+	simulateApiDelay
+} from '../../data/mockData'
 import { useNavigate } from 'react-router-dom'
 
 const UsersPage = () => {
@@ -25,15 +30,17 @@ const UsersPage = () => {
 	}, [])
 
 	useEffect(() => {
+		initializeUsuariosStorage()
 		loadUsers()
-	}, [mockUsuarios])
+	}, [])
 
 	const loadUsers = async () => {
 		try {
 			setIsLoading(true)
 			setError(null)
 			await simulateApiDelay()
-			setUsers(mockUsuarios)
+			const usersFromStorage = getUsuariosFromStorage()
+			setUsers(usersFromStorage)
 		} catch (err: any) {
 			console.error('Error loading users:', err)
 			setError(
@@ -189,7 +196,10 @@ const UsersPage = () => {
 
 			await simulateApiDelay()
 
-			// Filter out deleted users from local state
+			// Delete from localStorage
+			deleteUsuariosFromStorage(Array.from(selectedUsers))
+
+			// Update local state
 			setUsers((prev) =>
 				prev.filter((user) => !selectedUsers.has(user.id))
 			)
