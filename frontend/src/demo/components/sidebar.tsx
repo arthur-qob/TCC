@@ -4,7 +4,7 @@ import {
 	Users,
 	Route,
 	Settings,
-	BarChart2,
+	ClipboardPlus,
 	FileText,
 	Bell,
 	LogOut,
@@ -47,7 +47,7 @@ const Sidebar = ({ className = '' }: SidebarProps) => {
 		Clientes: BookUser,
 		Rotas: Route,
 		Frotas: Truck,
-		Relatórios: BarChart2,
+		Relatórios: ClipboardPlus,
 		Documentos: FileText,
 		Notificações: Bell,
 		Configurações: Settings

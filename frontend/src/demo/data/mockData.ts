@@ -911,6 +911,66 @@ export const mockRotas: Rota[] = [
 	}
 ]
 
+// Interface para Frota
+export interface Frota {
+	id: number
+	placa: string
+	status: 'DISPONIVEL' | 'INDISPONIVEL' | 'EM_MANUTENCAO'
+	motoristaId: number | null // Vincula com Usuario que tem tipo MOTORISTA
+}
+
+// Mock Frotas Data
+export const mockFrotas: Frota[] = [
+	{
+		id: 1,
+		placa: 'ABC-1234',
+		status: 'DISPONIVEL',
+		motoristaId: 5 // José Carlos
+	},
+	{
+		id: 2,
+		placa: 'DEF-5678',
+		status: 'DISPONIVEL',
+		motoristaId: 7 // Marco Silva
+	},
+	{
+		id: 3,
+		placa: 'GHI-9012',
+		status: 'EM_MANUTENCAO',
+		motoristaId: 8 // Alessandro Cerqueira
+	},
+	{
+		id: 4,
+		placa: 'JKL-3456',
+		status: 'DISPONIVEL',
+		motoristaId: 9 // Paulo Santos
+	},
+	{
+		id: 5,
+		placa: 'MNO-7890',
+		status: 'INDISPONIVEL',
+		motoristaId: 10 // Ricardo Oliveira
+	},
+	{
+		id: 6,
+		placa: 'PQR-1122',
+		status: 'DISPONIVEL',
+		motoristaId: 11 // Fernando Pinheiro
+	},
+	{
+		id: 7,
+		placa: 'STU-3344',
+		status: 'DISPONIVEL',
+		motoristaId: null // Sem motorista
+	},
+	{
+		id: 8,
+		placa: 'VWX-5566',
+		status: 'EM_MANUTENCAO',
+		motoristaId: null // Sem motorista
+	}
+]
+
 // Helper function to simulate API delay
 export const simulateApiDelay = (ms: number = 500): Promise<void> => {
 	return new Promise((resolve) => setTimeout(resolve, ms))

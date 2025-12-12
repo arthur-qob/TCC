@@ -2,29 +2,57 @@ import { useEffect, useState } from 'react'
 import { Container, Text } from '../../components/themed'
 import { useTheme } from '@/context/theme'
 import { ColorHex } from '../../constants/colors'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import Spinner from '../../components/spinner'
 import toast from '../../components/toast'
 import { simulateApiDelay, mockFrotas, mockUsuarios } from '../../data/mockData'
 import { UserRoles } from '@/utils/types/user.types'
 
-const CreateFrotaPage = () => {
+const EditFrotaPage = () => {
 	const { actualTheme } = useTheme()
 	const navigate = useNavigate()
+	const { id } = useParams<{ id: string }>()
 
 	const [placa, setPlaca] = useState<string>('')
 	const [status, setStatus] = useState<'DISPONIVEL' | 'INDISPONIVEL' | 'EM_MANUTENCAO'>('DISPONIVEL')
 	const [motoristaId, setMotoristaId] = useState<number | null>(null)
 	const [error, setError] = useState<string | null>(null)
 	const [loading, setLoading] = useState<boolean>(false)
+	const [isLoadingData, setIsLoadingData] = useState(true)
 
 	// Filtrar apenas motoristas
 	const motoristas = mockUsuarios.filter(u => u.tipo === UserRoles.MOTORISTA)
 
-	const handleLimpar = () => {
-		setPlaca('')
-		setStatus('DISPONIVEL')
-		setMotoristaId(null)
+	useEffect(() => {
+		loadFrota()
+	}, [id])
+
+	const loadFrota = async () => {
+		try {
+			setIsLoadingData(true)
+			await simulateApiDelay()
+
+			const frota = mockFrotas.find(f => f.id === Number(id))
+
+			if (!frota) {
+				setError('Frota não encontrada')
+				toast.emitToast({
+					type: 'error',
+					message: 'Frota não encontrada'
+				})
+				navigate('/demo/admin/frotas')
+				return
+			}
+
+			setPlaca(frota.placa)
+			setStatus(frota.status)
+			setMotoristaId(frota.motoristaId)
+		} catch (err: any) {
+			console.error('Error loading frota:', err)
+			setError('Erro ao carregar frota')
+		} finally {
+			setIsLoadingData(false)
+		}
 	}
 
 	// Formatar placa brasileira (ABC1234 ou ABC1D23)
@@ -62,46 +90,40 @@ const CreateFrotaPage = () => {
 		try {
 			await simulateApiDelay()
 			
-			// Gerar novo ID
-			const novoId = Math.max(...mockFrotas.map(f => f.id), 0) + 1
+			// Encontrar e atualizar a frota
+			const frotaIndex = mockFrotas.findIndex(f => f.id === Number(id))
 			
-			const novaFrota = {
-				id: novoId,
+			if (frotaIndex === -1) {
+				throw new Error('Frota não encontrada')
+			}
+
+			mockFrotas[frotaIndex] = {
+				...mockFrotas[frotaIndex],
 				placa: placa.toUpperCase(),
 				status: status,
 				motoristaId: motoristaId
 			}
 			
-			// Adicionar ao mockFrotas
-			mockFrotas.push(novaFrota)
-			
-			console.log('Frota criada com sucesso:', novaFrota)
-			console.log('Total de frotas:', mockFrotas.length)
+			console.log('Frota atualizada:', mockFrotas[frotaIndex])
 
-			handleLimpar()
 			toast.emitToast({
 				type: 'success',
-				message: 'Frota cadastrada com sucesso!'
+				message: 'Frota atualizada com sucesso!'
 			})
 			navigate('/demo/admin/frotas')
 		} catch (err: any) {
-			console.error('Error creating frota:', err)
+			console.error('Error updating frota:', err)
 			const errorMessage =
-				err.message || 'Erro ao criar frota. Tente novamente.'
+				err.message || 'Erro ao atualizar frota. Tente novamente.'
 			setError(errorMessage)
+			toast.emitToast({
+				type: 'error',
+				message: errorMessage
+			})
 		} finally {
 			setLoading(false)
 		}
 	}
-
-	useEffect(() => {
-		if (error) {
-			toast.emitToast({
-				type: 'error',
-				message: error
-			})
-		}
-	}, [error])
 
 	const isDark = actualTheme === 'dark'
 
@@ -120,12 +142,22 @@ const CreateFrotaPage = () => {
 
 	const labelClassName = 'text-sm font-medium mb-1 block'
 
+	if (isLoadingData) {
+		return (
+			<Container animate='fade-up'>
+				<div className='flex justify-center items-center min-h-[400px]'>
+					<Spinner />
+				</div>
+			</Container>
+		)
+	}
+
 	return (
 		<Container animate='fade-up'>
 			<Text
 				as='h1'
 				className='font-normal'>
-				Cadastrar Frota
+				Editar Frota
 			</Text>
 
 			<div
@@ -284,22 +316,22 @@ const CreateFrotaPage = () => {
 							className='px-4 sm:px-6 py-2.5 rounded-lg font-medium text-sm sm:text-base transition-all duration-200 hover:shadow-md active:scale-95'
 							style={{
 								backgroundColor: isDark
-									? ColorHex.red[600]
-									: ColorHex.red[500],
+									? ColorHex.zinc[600]
+									: ColorHex.zinc[500],
 								color: ColorHex.white
 							}}
 							onMouseEnter={(e) => {
 								e.currentTarget.style.backgroundColor = isDark
-									? ColorHex.red[700]
-									: ColorHex.red[600]
+									? ColorHex.zinc[700]
+									: ColorHex.zinc[600]
 							}}
 							onMouseLeave={(e) => {
 								e.currentTarget.style.backgroundColor = isDark
-									? ColorHex.red[600]
-									: ColorHex.red[500]
+									? ColorHex.zinc[600]
+									: ColorHex.zinc[500]
 							}}
-							onClick={handleLimpar}>
-							Limpar Formulário
+							onClick={() => navigate('/demo/admin/frotas')}>
+							Cancelar
 						</button>
 						<button
 							type='submit'
@@ -321,7 +353,7 @@ const CreateFrotaPage = () => {
 									: ColorHex.green[500]
 							}}
 							disabled={loading}>
-							{loading ? <Spinner /> : 'Cadastrar Frota'}
+							{loading ? <Spinner /> : 'Salvar Alterações'}
 						</button>
 					</div>
 				</form>
@@ -330,4 +362,4 @@ const CreateFrotaPage = () => {
 	)
 }
 
-export default CreateFrotaPage
+export default EditFrotaPage

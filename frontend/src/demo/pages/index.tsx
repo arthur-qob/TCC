@@ -1,184 +1,112 @@
-import { Eye, SquarePen, UserPlus } from 'lucide-react'
 import { Container, Text } from '../components/themed'
-import { DataTable, type Column } from '../components/dataTable'
-import { StatusPedido, UserRoles, type Pedido, TipoCarga } from '@/utils/types'
 import { useTheme } from '@/context/theme'
 import { ColorHex } from '../constants/colors'
-import { useEffect, useState } from 'react'
-import Spinner from '../components/spinner'
-import {
-	mockClientes,
-	mockPedidos,
-	mockUsuarios,
-	simulateApiDelay
-} from '../data/mockData'
-import { useNavigate } from 'react-router-dom'
-import Modal from '../components/modal'
+import { Trophy, TrendingUp, Users, Package } from 'lucide-react'
 
-interface PedidoFormatado extends Pedido {
-	nomeCliente: string
-	nomeMotorista: string | null
-	actions?: React.JSX.Element
+interface RankingItem {
+	nome: string
+	valor: number
+	porcentagem: number
 }
 
 const HomePage = () => {
-	const user = mockUsuarios[0] as any
 	const { actualTheme } = useTheme()
-	const navigate = useNavigate()
-	const [pedidos, setPedidos] = useState<Pedido[]>([])
-	const [isLoading, setIsLoading] = useState(true)
-	const [error, setError] = useState<string | null>(null)
-	const [modalMotoristaIsOpen, setModalMotoristaIsOpen] =
-		useState<boolean>(false)
-	const [modalPedidoIsOpen, setModalPedidoIsOpen] = useState<boolean>(false)
-	const [openPedidoId, setOpenPedidoId] = useState<number | null>(null)
 
-	const loadPedidos = async () => {
-		try {
-			setIsLoading(true)
-			setError(null)
-			await simulateApiDelay()
-			setPedidos(mockPedidos)
-		} catch (err: any) {
-			console.error('Error loading orders:', err)
-			setError(
-				err.response?.data?.message ||
-					'Erro ao carregar pedidos. Tente novamente.'
-			)
-		} finally {
-			setIsLoading(false)
-		}
-	}
-
-	useEffect(() => {
-		loadPedidos()
-	}, [mockPedidos])
-
-	const pedidosFormatados: PedidoFormatado[] = pedidos.map((pedido) => {
-		const cliente = mockClientes.find((c) => c.id === pedido.clienteId)
-		const motorista = mockUsuarios.find((u) => u.id === pedido.motoristaId)
-
-		return {
-			...pedido,
-			nomeCliente: cliente ? cliente.nome : 'Desconhecido',
-			nomeMotorista: motorista ? motorista.nome : null
-		}
-	})
-
-	const hasContainerPedidos = pedidos.some(
-		(p) => p.tipoCarga === TipoCarga.CONTAINER
-	)
-
-	const hasCarretas = pedidos.some((p) => Number(p.qtdCarretas) > 0)
-
-	const columns: Column<PedidoFormatado>[] = [
-		{
-			id: 'nomeCliente',
-			label: 'CLIENTE'
-		},
-		{
-			id: 'nomeMotorista',
-			label: 'MOTORISTA',
-			render: (value) =>
-				value ? (
-					value
-				) : (
-					<button
-						type='button'
-						className='bg-transparent border-none p-0 m-0 outline-none'
-						onClick={(e) => {
-							e.stopPropagation()
-							setModalMotoristaIsOpen(true)
-						}}>
-						<UserPlus className='mx-auto text-blue-500 hover:text-blue-600 transition-colors duration-300' />
-					</button>
-				)
-		},
-		{
-			id: 'dataCriacao',
-			label: 'CRIADO EM'
-		},
-		{
-			id: 'tipoOperacao',
-			label: 'OPERAÇÃO'
-		},
-		{
-			id: 'tipoCarga',
-			label: 'TIPO CARGA'
-		},
-		{
-			id: 'statusPedido',
-			label: 'STATUS',
-			render: (value) => {
-				const status = value as StatusPedido
-				return (
-					<p
-						className={`w-fit mx-auto ${
-							statusColors[status]?.bg || 'bg-gray-300'
-						} ${
-							statusColors[status]?.text || 'text-gray-700'
-						} p-2 rounded-full`}>
-						{status}
-					</p>
-				)
-			}
-		},
-		{
-			id: 'actions',
-			label: 'VER MAIS',
-			render: (_value, pedido) => (
-				<button
-					type='button'
-					className='bg-transparent border-none p-0 m-0 outline-none'
-					onClick={(e) => {
-						e.stopPropagation()
-						setModalPedidoIsOpen(true)
-						setOpenPedidoId(Number(pedido.id))
-					}}>
-					<Eye className='mx-auto text-blue-500 hover:text-blue-600 transition-colors duration-300' />
-				</button>
-			)
-		}
+	// Dados fictícios - Ranking de Motoristas
+	const rankingMotoristas: RankingItem[] = [
+		{ nome: 'José Carlos', valor: 156, porcentagem: 100 },
+		{ nome: 'Marco Silva', valor: 142, porcentagem: 91 },
+		{ nome: 'Alessandro Cerqueira', valor: 128, porcentagem: 82 },
+		{ nome: 'Paulo Santos', valor: 115, porcentagem: 74 },
+		{ nome: 'Ricardo Oliveira', valor: 98, porcentagem: 63 }
 	]
 
-	const statusColors: Record<StatusPedido, { bg: string; text: string }> = {
-		[StatusPedido.PENDENTE]: {
-			bg: 'bg-yellow-300',
-			text: 'text-yellow-700'
-		},
-		[StatusPedido.APROVADO]: { bg: 'bg-blue-300', text: 'text-blue-700' },
-		[StatusPedido.EM_ANDAMENTO]: {
-			bg: 'bg-purple-300',
-			text: 'text-purple-700'
-		},
-		[StatusPedido.CONCLUIDO]: {
-			bg: 'bg-green-300',
-			text: 'text-green-700'
-		},
-		[StatusPedido.CANCELADO]: { bg: 'bg-red-300', text: 'text-red-700' }
-	}
+	// Dados fictícios - Ranking de Pedidos por Mês
+	const rankingPedidos: RankingItem[] = [
+		{ nome: 'Dezembro 2024', valor: 487, porcentagem: 100 },
+		{ nome: 'Novembro 2024', valor: 456, porcentagem: 94 },
+		{ nome: 'Outubro 2024', valor: 412, porcentagem: 85 },
+		{ nome: 'Setembro 2024', valor: 389, porcentagem: 80 },
+		{ nome: 'Agosto 2024', valor: 365, porcentagem: 75 }
+	]
 
-	const roleActions: Record<string, React.JSX.Element> = {
-		FOCAL: (
-			<Eye className='mx-auto text-blue-500 hover:text-blue-600 transition-colors duration-300' />
-		),
-		PROGRAMADOR: (
-			<UserPlus className='mx-auto text-blue-500 hover:text-blue-600 transition-colors duration-300' />
-		),
-		GERENTE_FROTA: (
-			<SquarePen className='mx-auto text-blue-500 hover:text-blue-600 transition-colors duration-300' />
-		),
-		ADMIN: (
-			<SquarePen className='mx-auto text-blue-500 hover:text-blue-600 transition-colors duration-300' />
+	// Dados fictícios - Ranking de Clientes
+	const rankingClientes: RankingItem[] = [
+		{ nome: 'Nestlé Brasil - Três Rios', valor: 89, porcentagem: 100 },
+		{ nome: 'Nissan do Brasil - Resende', valor: 76, porcentagem: 85 },
+		{ nome: 'Coca-Cola FEMSA - Duque de Caxias', valor: 68, porcentagem: 76 },
+		{ nome: 'Volkswagen - São José dos Pinhais', valor: 54, porcentagem: 61 },
+		{ nome: 'Ambev - Nova Iguaçu', valor: 48, porcentagem: 54 }
+	]
+
+	const RankingCard = ({
+		titulo,
+		icone,
+		dados,
+		cor,
+		unidade
+	}: {
+		titulo: string
+		icone: React.ReactNode
+		dados: RankingItem[]
+		cor: string
+		unidade: string
+	}) => {
+		return (
+			<div
+				className={`p-6 rounded-xl shadow-lg border ${
+					actualTheme === 'dark'
+						? 'bg-zinc-800 border-zinc-700'
+						: 'bg-white border-gray-200'
+				}`}>
+				<div className='flex items-center gap-3 mb-6'>
+					<div className={`p-3 rounded-lg ${cor}`}>{icone}</div>
+					<Text className='text-xl font-semibold'>{titulo}</Text>
+				</div>
+
+				<div className='space-y-4'>
+					{dados.map((item, index) => (
+						<div
+							key={index}
+							className='space-y-2'>
+							<div className='flex items-center justify-between'>
+								<div className='flex items-center gap-2'>
+									{index === 0 && (
+										<Trophy
+											className='text-yellow-500'
+											size={20}
+										/>
+									)}
+									<span
+										className={`font-medium ${
+											index === 0 ? 'text-lg' : 'text-base'
+										}`}>
+										{item.nome}
+									</span>
+								</div>
+								<span className='font-bold text-lg'>
+									{item.valor} {unidade}
+								</span>
+							</div>
+							<div className='w-full h-3 bg-gray-200 rounded-full overflow-hidden'>
+								<div
+									className={`h-full rounded-full transition-all duration-500 ${
+										index === 0
+											? 'bg-gradient-to-r from-yellow-400 to-yellow-600'
+											: index === 1
+											? 'bg-gradient-to-r from-gray-300 to-gray-500'
+											: index === 2
+											? 'bg-gradient-to-r from-orange-300 to-orange-500'
+											: cor.replace('bg-', 'bg-gradient-to-r from-') + '-400 to-' + cor.replace('bg-', '') + '-600'
+									}`}
+									style={{ width: `${item.porcentagem}%` }}
+								/>
+							</div>
+						</div>
+					))}
+				</div>
+			</div>
 		)
-	}
-
-	const showActions =
-		user?.tipo === UserRoles.GERENTE_FROTA ||
-		user?.tipo === UserRoles.PROGRAMADOR
-
-	const handleRowClick = (pedido: PedidoFormatado) => {
-		navigate(`/demo/pedidos/editar/${pedido.id}`)
 	}
 
 	return (
@@ -189,286 +117,112 @@ const HomePage = () => {
 					? `bg-[${ColorHex.zinc[950]}]`
 					: `bg-[${ColorHex.white}]`
 			}`}>
-			<Modal
-				isOpen={modalMotoristaIsOpen}
-				onClose={() => setModalMotoristaIsOpen(false)}>
-				<div className='p-6'>
-					<h2 className='text-xl font-semibold mb-4'>
-						Atribuir Motorista
-					</h2>
-					<p className='mb-4'>
-						A funcionalidade de atribuição de motorista ainda não
-						foi implementada.
+			<div className='flex items-center gap-3 mb-8'>
+				<TrendingUp
+					size={32}
+					className='text-blue-500'
+				/>
+				<Text className='text-3xl font-bold'>Relatórios e Rankings</Text>
+			</div>
+
+			<div className='mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg'>
+				<p className='text-blue-800 text-sm'>
+					📊 <strong>Período de análise:</strong> Últimos 6 meses (Junho
+					- Novembro 2025)
+				</p>
+			</div>
+
+			<div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6'>
+				{/* Ranking de Motoristas */}
+				<RankingCard
+					titulo='Top 5 Motoristas'
+					icone={
+						<Users
+							className='text-white'
+							size={24}
+						/>
+					}
+					dados={rankingMotoristas}
+					cor='bg-blue-500'
+					unidade='entregas'
+				/>
+
+				{/* Ranking de Pedidos */}
+				<RankingCard
+					titulo='Pedidos por Mês'
+					icone={
+						<Package
+							className='text-white'
+							size={24}
+						/>
+					}
+					dados={rankingPedidos}
+					cor='bg-purple-500'
+					unidade='pedidos'
+				/>
+
+				{/* Ranking de Clientes */}
+				<RankingCard
+					titulo='Top 5 Clientes'
+					icone={
+						<TrendingUp
+							className='text-white'
+							size={24}
+						/>
+					}
+					dados={rankingClientes}
+					cor='bg-green-500'
+					unidade='pedidos'
+				/>
+			</div>
+
+			{/* Resumo Estatístico */}
+			<div className='mt-8 grid grid-cols-1 md:grid-cols-3 gap-4'>
+				<div
+					className={`p-6 rounded-xl text-center shadow-lg ${
+						actualTheme === 'dark'
+							? 'bg-gradient-to-br from-blue-900 to-blue-700'
+							: 'bg-gradient-to-br from-blue-500 to-blue-600'
+					}`}>
+					<p className='text-white text-sm font-medium mb-2'>
+						Total de Entregas
+					</p>
+					<p className='text-white text-4xl font-bold'>2.209</p>
+					<p className='text-blue-100 text-xs mt-2'>
+						+12% vs período anterior
 					</p>
 				</div>
-			</Modal>
 
-			<Modal
-				isOpen={modalPedidoIsOpen}
-				onClose={() => setModalPedidoIsOpen(false)}>
-				<section>
-					<div className='flex items-center gap-4 border-b pb-3'>
-						<Text className='w-fit capitalize text-2xl font-medium'>
-							Pedido {openPedidoId}
-						</Text>
-						<button
-							type='button'
-							onClick={() =>
-								navigate(`/demo/pedidos/editar/${openPedidoId}`)
-							}>
-							<SquarePen className='text-blue-500 hover:text-blue-600 transition-colors duration-300' />
-						</button>
-					</div>
-					<div className='mt-6 space-y-4'>
-						{openPedidoId &&
-							pedidosFormatados.find(
-								(p) => p.id === openPedidoId
-							) &&
-							(() => {
-								const pedido = pedidosFormatados.find(
-									(p) => p.id === openPedidoId
-								)!
-								return (
-									<>
-										<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-											<div>
-												<p className='text-sm font-semibold text-gray-600'>
-													Cliente
-												</p>
-												<p className='text-base'>
-													{pedido.nomeCliente}
-												</p>
-											</div>
-											<div>
-												<p className='text-sm font-semibold text-gray-600'>
-													Motorista
-												</p>
-												<p className='text-base'>
-													{pedido.nomeMotorista ||
-														'Não atribuído'}
-												</p>
-											</div>
-											<div>
-												<p className='text-sm font-semibold text-gray-600'>
-													Data de Criação
-												</p>
-												<p className='text-base'>
-													{pedido.dataCriacao}
-												</p>
-											</div>
-											<div>
-												<p className='text-sm font-semibold text-gray-600'>
-													Tipo de Operação
-												</p>
-												<p className='text-base'>
-													{pedido.tipoOperacao}
-												</p>
-											</div>
-											<div>
-												<p className='text-sm font-semibold text-gray-600'>
-													Tipo de Carga
-												</p>
-												<p className='text-base'>
-													{pedido.tipoCarga}
-												</p>
-											</div>
-											<div>
-												<p className='text-sm font-semibold text-gray-600'>
-													Status
-												</p>
-												<p
-													className={`w-fit ${
-														statusColors[
-															pedido.statusPedido
-														]?.bg || 'bg-gray-300'
-													} ${
-														statusColors[
-															pedido.statusPedido
-														]?.text ||
-														'text-gray-700'
-													} px-3 py-1 rounded-full text-sm`}>
-													{pedido.statusPedido}
-												</p>
-											</div>
-											{pedido.dataExecucao && (
-												<div>
-													<p className='text-sm font-semibold text-gray-600'>
-														Data de Execução
-													</p>
-													<p className='text-base'>
-														{pedido.dataExecucao}
-													</p>
-												</div>
-											)}
-											{pedido.numContainerNotaFiscal && (
-												<div>
-													<p className='text-sm font-semibold text-gray-600'>
-														Nº Container/Nota Fiscal
-													</p>
-													<p className='text-base'>
-														{
-															pedido.numContainerNotaFiscal
-														}
-													</p>
-												</div>
-											)}
-											{pedido.qtdContaineres !== null &&
-												pedido.qtdContaineres !==
-													undefined && (
-													<div>
-														<p className='text-sm font-semibold text-gray-600'>
-															Quantidade de
-															Contêineres
-														</p>
-														<p className='text-base'>
-															{
-																pedido.qtdContaineres
-															}
-														</p>
-													</div>
-												)}
-											{pedido.qtdCarretas !== null &&
-												pedido.qtdCarretas !==
-													undefined && (
-													<div>
-														<p className='text-sm font-semibold text-gray-600'>
-															Quantidade de
-															Carretas
-														</p>
-														<p className='text-base'>
-															{pedido.qtdCarretas}
-														</p>
-													</div>
-												)}
-											{pedido.imo && (
-												<div>
-													<p className='text-sm font-semibold text-gray-600'>
-														IMO
-													</p>
-													<p className='text-base'>
-														{pedido.imo}
-													</p>
-												</div>
-											)}
-											{pedido.rotaId && (
-												<div>
-													<p className='text-sm font-semibold text-gray-600'>
-														Rota ID
-													</p>
-													<p className='text-base'>
-														{pedido.rotaId}
-													</p>
-												</div>
-											)}
-											<div>
-												<p className='text-sm font-semibold text-gray-600'>
-													Focal
-												</p>
-												<p className='text-base'>
-													{mockUsuarios.find(
-														(u) =>
-															u.id ===
-															pedido.focalId
-													)?.nome ||
-														`ID: ${pedido.focalId}`}
-												</p>
-											</div>
-											<div>
-												<p className='text-sm font-semibold text-gray-600'>
-													Programador
-												</p>
-												<p className='text-base'>
-													{pedido.programadorId
-														? mockUsuarios.find(
-																(u) =>
-																	u.id ===
-																	pedido.programadorId
-														  )?.nome ||
-														  `ID: ${pedido.programadorId}`
-														: 'Não atribuído'}
-												</p>
-											</div>
-											<div>
-												<p className='text-sm font-semibold text-gray-600'>
-													Gerente de Frota
-												</p>
-												<p className='text-base'>
-													{pedido.gerenteFrotaId
-														? mockUsuarios.find(
-																(u) =>
-																	u.id ===
-																	pedido.gerenteFrotaId
-														  )?.nome ||
-														  `ID: ${pedido.gerenteFrotaId}`
-														: 'Não atribuído'}
-												</p>
-											</div>
-											<div>
-												<p className='text-sm font-semibold text-gray-600'>
-													Gerente de Risco
-												</p>
-												<p className='text-base'>
-													{pedido.gerenteRiscoId
-														? mockUsuarios.find(
-																(u) =>
-																	u.id ===
-																	pedido.gerenteRiscoId
-														  )?.nome ||
-														  `ID: ${pedido.gerenteRiscoId}`
-														: 'Não atribuído'}
-												</p>
-											</div>
-											{pedido.observacoes && (
-												<div className='md:col-span-2'>
-													<p className='text-sm font-semibold text-gray-600'>
-														Observações
-													</p>
-													<p className='text-base'>
-														{pedido.observacoes}
-													</p>
-												</div>
-											)}
-										</div>
-									</>
-								)
-							})()}
-					</div>
-				</section>
-			</Modal>
-			<div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 w-full'>
-				<Text className='w-fit capitalize text-2xl font-medium'>
-					Pedidos
-				</Text>
-				{(user?.tipo === UserRoles.FOCAL ||
-					user?.tipo === UserRoles.GERENTE_FROTA ||
-					user?.tipo === UserRoles.ADMIN) && (
-					<button
-						className='w-full sm:w-fit bg-[rgb(15,219,110)] hover:bg-[hsla(149,87%,40%,1.00)] transition-colors duration-300 text-white px-3 sm:px-4 py-2 sm:py-3 rounded-xl shadow-lg text-sm sm:text-base'
-						onClick={() => navigate('/demo/pedidos/novo')}>
-						Criar novo pedido
-					</button>
-				)}
-			</div>
-			{isLoading ? (
-				<div className='flex justify-center items-center min-h-full'>
-					<Spinner />
+				<div
+					className={`p-6 rounded-xl text-center shadow-lg ${
+						actualTheme === 'dark'
+							? 'bg-gradient-to-br from-purple-900 to-purple-700'
+							: 'bg-gradient-to-br from-purple-500 to-purple-600'
+					}`}>
+					<p className='text-white text-sm font-medium mb-2'>
+						Total de Pedidos
+					</p>
+					<p className='text-white text-4xl font-bold'>2.109</p>
+					<p className='text-purple-100 text-xs mt-2'>
+						+8% vs período anterior
+					</p>
 				</div>
-			) : pedidos.length > 0 ? (
-				<DataTable
-					columns={columns}
-					data={pedidosFormatados}
-					getRowKey={(order) => order.id}
-					showActionsColumn={showActions}
-					renderActions={() =>
-						user?.tipo ? roleActions[user.tipo] : null
-					}
-					onRowClick={handleRowClick}
-				/>
-			) : (
-				<p className='mt-6 text-center text-gray-500'>
-					Nenhum pedido encontrado.
-				</p>
-			)}
+
+				<div
+					className={`p-6 rounded-xl text-center shadow-lg ${
+						actualTheme === 'dark'
+							? 'bg-gradient-to-br from-green-900 to-green-700'
+							: 'bg-gradient-to-br from-green-500 to-green-600'
+					}`}>
+					<p className='text-white text-sm font-medium mb-2'>
+						Clientes Ativos
+					</p>
+					<p className='text-white text-4xl font-bold'>10</p>
+					<p className='text-green-100 text-xs mt-2'>
+						+2 novos este mês
+					</p>
+				</div>
+			</div>
 		</Container>
 	)
 }

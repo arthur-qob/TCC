@@ -5,7 +5,6 @@ import { ColorHex } from '../constants/colors'
 import { usePermissionNavigate } from '@/utils/routes'
 import Spinner from '../components/spinner'
 import toast from '../components/toast'
-import type { CriarClienteBaseDTO } from '@/utils/types/cliente.types'
 import { simulateApiDelay } from '../data/mockData'
 
 const CreateClientePage = () => {
@@ -92,15 +91,6 @@ const CreateClientePage = () => {
 		e.preventDefault()
 		setError(null)
 
-		const baseData: CriarClienteBaseDTO = {
-			nome,
-			email,
-			cpf: selectedClientDoc === 'cpf' ? cpf : undefined,
-			cnpj: selectedClientDoc === 'cnpj' ? cnpj : undefined,
-			telefone,
-			observacoes
-		}
-
 		if (
 			!nome ||
 			!email ||
@@ -115,10 +105,34 @@ const CreateClientePage = () => {
 
 		try {
 			await simulateApiDelay()
-			console.log('Client created successfully (DEMO):', baseData)
+			
+			// Importar mockClientes para adicionar o novo cliente
+			const { mockClientes } = await import('../data/mockData')
+			
+			// Gerar novo ID (próximo ID disponível)
+			const novoId = Math.max(...mockClientes.map(c => c.id)) + 1
+			
+			// Criar novo cliente
+			const novoCliente = {
+				id: novoId,
+				nome,
+				email,
+				cpfCnpj: selectedClientDoc === 'cpf' ? cpf : cnpj,
+				telefone: telefone || '',
+				observacoes: observacoes || ''
+			}
+			
+			// Adicionar ao array mockClientes
+			mockClientes.push(novoCliente)
+			
+			console.log('Cliente criado com sucesso:', novoCliente)
+			console.log('Total de clientes:', mockClientes.length)
 
 			handleLimpar()
-			alert('Cliente cadastrado com sucesso!')
+			toast.emitToast({
+				type: 'success',
+				message: 'Cliente cadastrado com sucesso!'
+			})
 			navigate('/demo/clientes')
 		} catch (err: any) {
 			console.error('Error creating client:', err)

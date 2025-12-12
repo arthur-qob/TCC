@@ -3,14 +3,15 @@ import Spinner from '../components/spinner'
 import { Container, Text } from '../components/themed'
 import { ColorHex, getColor } from '../constants/colors'
 import { useTheme } from '@/context/theme'
-import { usePermissionNavigate } from '@/utils/routes'
+// import { usePermissionNavigate } from '@/utils/routes'
 import type { Cliente } from '@/utils/types'
 import { useEffect, useState } from 'react'
 import { Checkbox } from '@mui/material'
 import { mockClientes, mockUsuarios, simulateApiDelay } from '../data/mockData'
+import { useNavigate } from 'react-router-dom'
 
 const ClientesPage = () => {
-	const navigate = usePermissionNavigate()
+	const navigate = useNavigate()
 	const user = mockUsuarios[0] as any
 	const [clientes, setClientes] = useState<Cliente[]>([])
 	const [isLoading, setIsLoading] = useState(true)
@@ -175,7 +176,7 @@ const ClientesPage = () => {
 						user?.tipo === 'GERENTE_FROTA') && (
 						<button
 							onClick={() =>
-								navigate('/clientes/cadastrar-cliente')
+								navigate('/demo/clientes/cadastrar-cliente')
 							}
 							className={`w-full sm:w-fit bg-${getColor(
 								'success',

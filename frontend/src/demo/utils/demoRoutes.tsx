@@ -8,8 +8,10 @@ import RotasPage from '../pages/viewRotas'
 import CreatePedidoPage from '../pages/createPedido'
 import CreateUsuarioPage from '../pages/admin/createUsuario'
 import CreateFrotaPage from '../pages/admin/createFrota'
+import EditFrotaPage from '../pages/admin/editFrota'
 import SignInPageDemo from '../pages/signin'
 import EditPedidoPage from '../pages/editPedido'
+import RelatoriosPage from '../pages/relatorios'
 
 const DemoRoutes = () => {
 	return (
@@ -64,12 +66,24 @@ const DemoRoutes = () => {
 				element={<EditPedidoPage />}
 			/>
 			<Route
-				path='/demo/admin/cadastrar-frota'
+				path='/demo/admin/frotas'
+				element={<FrotasPage />}
+			/>
+			<Route
+				path='/demo/admin/frotas/novo'
 				element={<CreateFrotaPage />}
+			/>
+			<Route
+				path='/demo/admin/frotas/editar/:id'
+				element={<EditFrotaPage />}
 			/>
 			<Route
 				path='/demo/admin/usuarios'
 				element={<UsersPage />}
+			/>
+			<Route
+				path='/demo/relatorios'
+				element={<RelatoriosPage />}
 			/>
 		</Routes>
 	)
@@ -79,24 +93,28 @@ const sidebarRoutesPerRole = {
 	FOCAL: {
 		Dashboard: '/demo/dashboard',
 		Clientes: '/demo/clientes',
-		Frotas: '/demo/admin/frotas'
+		Frotas: '/demo/admin/frotas',
+		Relatórios: '/demo/relatorios'
 	},
 	PROGRAMADOR: {
 		Dashboard: '/demo/dashboard',
 		Clientes: '/demo/clientes',
-		Frotas: '/demo/admin/frotas'
+		Frotas: '/demo/admin/frotas',
+		Relatórios: '/demo/relatorios'
 	},
 	GERENTE_FROTA: {
 		Dashboard: '/demo/dashboard',
 		Usuários: '/demo/admin/usuarios',
 		Clientes: '/demo/clientes',
-		Frotas: '/demo/admin/frotas'
+		Frotas: '/demo/admin/frotas',
+		Relatórios: '/demo/relatorios'
 	},
 	ADMIN: {
 		Dashboard: '/demo/dashboard',
 		Usuários: '/demo/admin/usuarios',
 		Clientes: '/demo/clientes',
-		Frotas: '/demo/admin/frotas'
+		Frotas: '/demo/admin/frotas',
+		Relatórios: '/demo/relatorios'
 	}
 }
 
